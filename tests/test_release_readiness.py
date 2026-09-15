@@ -108,16 +108,16 @@ def test_readme_uses_collapsible_sections_for_information_architecture():
     assert readme.count("<details") == 10
 
     expected_summaries = [
-        "What Sky2Cd does and does not do",
-        "Quick start / Blender workflow",
-        "Donor suggestions and JSON",
-        "Optional CrimsonForge / DMM workflow",
-        "GUI features",
-        "Troubleshooting",
-        "Technical safety notes / geometry history",
-        "Developer / CLI workflow",
-        "Licensing and third-party notices",
-        "More documentation",
+        "✅ What Sky2Cd does and does not do",
+        "🧭 Quick start / Blender workflow",
+        "🎯 Donor suggestions and JSON",
+        "🔧 Optional CrimsonForge / DMM workflow",
+        "🖥️ GUI features",
+        "🛠️ Troubleshooting",
+        "📐 Technical safety notes / geometry history",
+        "💻 Developer / CLI workflow",
+        "⚖️ Licensing and third-party notices",
+        "📚 More documentation",
     ]
     for summary in expected_summaries:
         assert f"<summary><b>{summary}</b></summary>" in readme
@@ -128,6 +128,16 @@ def test_readme_uses_collapsible_sections_for_information_architecture():
     for index, line in enumerate(lines):
         if line.startswith("<summary>"):
             assert lines[index + 1] == ""
+
+    # A compact "On this page" scan strip lists every section with the same
+    # emoji marker as its <summary>, and tells readers the rows are clickable.
+    assert "### On this page" in readme
+    on_this_page = readme.split("### On this page", 1)[1].split("---", 1)[0]
+    for summary in expected_summaries:
+        assert summary.replace(" ", "").replace("*", "") in on_this_page.replace(
+            "*", ""
+        ).replace(" ", "")
+    assert "expand" in on_this_page.lower()
 
     # The short top intro (before the first collapsible section) still carries the
     # download link, requirements, and the honest limitation statement.

@@ -16,10 +16,27 @@ sky2cd blender-handoff --input outfit.zip --out .\handoff_out
 # weight-paint, rig, and validate the result manually.
 ```
 
-Full guides: [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md) · [`docs/EXAMPLE_WORKFLOW.md`](docs/EXAMPLE_WORKFLOW.md) · [`docs/NEXUS_LISTING.md`](docs/NEXUS_LISTING.md) · [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md). The collapsible sections below cover the rest.
+Full guides: [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md) · [`docs/EXAMPLE_WORKFLOW.md`](docs/EXAMPLE_WORKFLOW.md) · [`docs/NEXUS_LISTING.md`](docs/NEXUS_LISTING.md) · [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+
+### On this page
+
+Click any row below to expand it — each one starts collapsed to keep this page short.
+
+- ✅ **What Sky2Cd does and does not do**
+- 🧭 **Quick start / Blender workflow**
+- 🎯 **Donor suggestions and JSON**
+- 🔧 **Optional CrimsonForge / DMM workflow**
+- 🖥️ **GUI features**
+- 🛠️ **Troubleshooting**
+- 📐 **Technical safety notes / geometry history**
+- 💻 **Developer / CLI workflow**
+- ⚖️ **Licensing and third-party notices**
+- 📚 **More documentation**
+
+---
 
 <details open>
-<summary><b>What Sky2Cd does and does not do</b></summary>
+<summary><b>✅ What Sky2Cd does and does not do</b></summary>
 
 **`Sky2Cd` is not a fully automatic Skyrim-to-Crimson Desert wearable converter.**
 The recommended workflow ends with a Blender preview/mockup that an artist evaluates
@@ -38,8 +55,11 @@ rig/weight transfer, rebuild/export, and in-game/animation testing. `Sky2Cd` doe
 claim, infer, or certify any of those steps.
 
 </details>
+
+---
+
 <details open>
-<summary><b>Quick start / Blender workflow</b></summary>
+<summary><b>🧭 Quick start / Blender workflow</b></summary>
 
 **Recommended workflow — Blender first, no donor required:**
 
@@ -50,8 +70,11 @@ sky2cd blender-handoff --input outfit.zip --out .\handoff_out
 ```
 
 </details>
+
+---
+
 <details>
-<summary><b>Donor suggestions and JSON</b></summary>
+<summary><b>🎯 Donor suggestions and JSON</b></summary>
 
 **Optional donor reference:** when a donor helps the artist compare materials, scale,
 or slot context, add `--piece`, `--packages-path`, and `--crimsonforge-home` to
@@ -89,8 +112,11 @@ and the artist-validation boundary. `blender-handoff` also writes
 `metadata.json`, so the recommendation stays with the Blender handoff files.
 
 </details>
+
+---
+
 <details>
-<summary><b>Optional CrimsonForge / DMM workflow</b></summary>
+<summary><b>🔧 Optional CrimsonForge / DMM workflow</b></summary>
 
 **Optional DMM packaging:** only after the artist has independently rebuilt and
 validated a `.pac`, use `package-dmm [--strict]`. `--strict` checks sidecar presence,
@@ -755,8 +781,11 @@ that land in a sparsely-weighted donor region.
 The GUI has a matching "Donor merge" panel with the same fields.
 
 </details>
+
+---
+
 <details>
-<summary><b>GUI features</b></summary>
+<summary><b>🖥️ GUI features</b></summary>
 
 ### Desktop GUI
 
@@ -823,8 +852,11 @@ advanced/scripted users directly from
 copy/BBCode used on Nexus.
 
 </details>
+
+---
+
 <details>
-<summary><b>Troubleshooting</b></summary>
+<summary><b>🛠️ Troubleshooting</b></summary>
 
 If nothing changed after downloading/rebuilding a newer GUI exe, fully close every
 existing `Sky2Cd` window first — an old window left open from before can look
@@ -846,8 +878,11 @@ Blender, missing CrimsonForge/game paths, stale GUI processes), see
 [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md).
 
 </details>
+
+---
+
 <details>
-<summary><b>Technical safety notes / geometry history</b></summary>
+<summary><b>📐 Technical safety notes / geometry history</b></summary>
 
 ### Geometry safety correction (2026-09-13)
 
@@ -1185,8 +1220,11 @@ Do not delete faces or rotate the garment to hide that discrepancy.
 diagnostic images document the evidence and limitations.
 
 </details>
+
+---
+
 <details>
-<summary><b>Developer / CLI workflow</b></summary>
+<summary><b>💻 Developer / CLI workflow</b></summary>
 
 ### What works now
 
@@ -1331,8 +1369,11 @@ Minimal `body-config.json`:
 For test and tooling workflows, `convert` also accepts a `.meshir.json` input directly in place of `.nif`.
 
 </details>
+
+---
+
 <details>
-<summary><b>Licensing and third-party notices</b></summary>
+<summary><b>⚖️ Licensing and third-party notices</b></summary>
 
 `Sky2Cd`'s own code is MIT licensed (see [`LICENSE`](LICENSE)). The optional
 `.nif` importer can bundle a vendored `NiflyDLL.dll` component derived from the
@@ -1347,8 +1388,11 @@ against GPL-3.0 source-availability requirements) are recorded in
 build that includes the vendored PyNifly component.
 
 </details>
+
+---
+
 <details>
-<summary><b>More documentation</b></summary>
+<summary><b>📚 More documentation</b></summary>
 
 - [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md) — the full practical user guide: install, first launch, dark mode, the Blender workflow step by step, donor suggestions, optional donor verification/DMM packaging, GUI controls, and troubleshooting.
 - [`docs/EXAMPLE_WORKFLOW.md`](docs/EXAMPLE_WORKFLOW.md) — a placeholder-only first-run walkthrough naming no bundled game or mod assets.
