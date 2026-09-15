@@ -1,6 +1,6 @@
-# sky2cd
+# Sky2Cd
 
-`sky2cd` is a Blender preparation toolkit for artist-assisted Skyrim outfit work. It uses a game-agnostic `MeshIR` intermediate representation to make input inspection, safe geometry/axis conversion, and Blender handoff repeatable without claiming that an outfit is converted into a wearable game asset.
+`Sky2Cd` is a Blender preparation toolkit for artist-assisted Skyrim outfit work. It uses a game-agnostic `MeshIR` intermediate representation to make input inspection, safe geometry/axis conversion, and Blender handoff repeatable without claiming that an outfit is converted into a wearable game asset.
 
 For a placeholder-only first run, see
 [`docs/EXAMPLE_WORKFLOW.md`](docs/EXAMPLE_WORKFLOW.md). For a full practical
@@ -11,7 +11,7 @@ licensing and the current public-binary release blocker are recorded in
 
 ## Supported workflow (read this first)
 
-**`sky2cd` is not a fully automatic Skyrim-to-Crimson Desert wearable converter.**
+**`Sky2Cd` is not a fully automatic Skyrim-to-Crimson Desert wearable converter.**
 The recommended workflow ends with a Blender preview/mockup that an artist evaluates
 and develops manually. It does **not** produce a fitted, rigged, tested, or game-ready
 outfit.
@@ -24,7 +24,7 @@ outfit.
   validated game asset.
 
 **What the artist still owns:** body fitting, clipping fixes, material review, native
-rig/weight transfer, rebuild/export, and in-game/animation testing. `sky2cd` does not
+rig/weight transfer, rebuild/export, and in-game/animation testing. `Sky2Cd` does not
 claim, infer, or certify any of those steps.
 
 **Recommended workflow — Blender first, no donor required:**
@@ -439,7 +439,7 @@ diagnostic images document the evidence and limitations.
   ```
 
 - A tkinter desktop GUI (`sky2cd.gui`) wraps the same pipeline: file/folder pickers (supporting `.nif`, `.meshir.json`, `.7z`, `.zip`), a deformer dropdown, a background-threaded Convert button that keeps the window responsive, a scrolling status/error log, and Show report / Open output folder buttons. It calls the real `sky2cd.pipeline.convert` — no simulated conversion — and surfaces every exception verbatim in the log and a message box.
-- **Mod archive extraction:** `.7z` and `.zip` mod packages can be dropped in directly. `sky2cd` extracts them, discovers all outfit meshes inside (preferring max-weight `_1.nif` variants when both `_0` and `_1` are present), and batch-converts all pieces to PAC files with a unified conversion report.
+- **Mod archive extraction:** `.7z` and `.zip` mod packages can be dropped in directly. `Sky2Cd` extracts them, discovers all outfit meshes inside (preferring max-weight `_1.nif` variants when both `_0` and `_1` are present), and batch-converts all pieces to PAC files with a unified conversion report.
 
 The project intentionally uses `argparse` from the Python standard library instead of Click to keep runtime dependencies minimal.
 
@@ -474,7 +474,7 @@ Manager" workflow) and [`dmm-parser`](https://github.com/exodiaprivate-eng/dmm-p
   on `iteminfo`), give it your own name/description/stats/passives, and put it on a
   vendor or drop table. This reuses a vanilla mesh — no Skyrim-mesh conversion involved
   — and is confirmed working in-game. This is a completely different tool from
-  `sky2cd`'s mesh pipeline; it would use `dmm-parser`'s `pabgb`/`paloc` table APIs and
+  `Sky2Cd`'s mesh pipeline; it would use `dmm-parser`'s `pabgb`/`paloc` table APIs and
   Field-JSON v3.1 intents instead.
 - **Tier 2 — your own mesh, on a free slot.** Solved for weapon families that don't
   sheathe (shields, pikes, bows, fists, etc.). Still requires writing a real mesh in the
@@ -484,7 +484,7 @@ Manager" workflow) and [`dmm-parser`](https://github.com/exodiaprivate-eng/dmm-p
   author; scabbards must currently be borrowed from a vanilla weapon.
 
 **Historical assessment (superseded by the geometry safety correction above):**
-`sky2cd`'s MeshIR pipeline provides reusable groundwork, but the final
+`Sky2Cd`'s MeshIR pipeline provides reusable groundwork, but the final
 "write it as a real Crimson Desert asset" step is currently a research problem, not an
 engineering one — it requires reverse-engineering an undocumented binary mesh format,
 which is a different (and much larger, uncertain) kind of project than converting the
@@ -520,7 +520,7 @@ first place.
 ## Historical research: external tooling and optional packaging
 
 This section records research into external tooling and advanced packaging paths. It
-does not change `sky2cd`'s Blender-focused scope: neither donor selection, automated
+does not change `Sky2Cd`'s Blender-focused scope: neither donor selection, automated
 steps, nor a packaged file establishes a fitted, rigged, wearable, or game-ready
 result. Treat these paths as optional support for an artist's independently validated
 work, not the primary workflow.
@@ -542,11 +542,11 @@ an edited mesh (including topology changes), and patch it back into a valid, loa
 [**Body Slider Outfitter**](https://www.nexusmods.com/crimsondesert/mods/2993). These
 are the tools the CD outfit-modding community actually uses to conform an outfit's mesh
 to a custom body shape and batch-process penetration fixing — this overlaps
-significantly with what `sky2cd`'s own IDW deformer + `fix_penetration` step were built
+significantly with what `Sky2Cd`'s own IDW deformer + `fix_penetration` step were built
 to approximate from scratch. They take a target body `.pac` as a "Custom Slider" input
 and a folder of outfit models, and their batch workflow has a **built-in "Penetration
 Fix" checkbox** — i.e. the community has already solved body-conforming with access to
-the game's real skeleton/weight data, which `sky2cd` never had.
+the game's real skeleton/weight data, which `Sky2Cd` never had.
 
 ### The real, confirmed workflow (from a shipped mod's own documentation)
 
@@ -562,16 +562,16 @@ assets — confirming every step below is achievable in practice, not theory:
 4. Run **batch processing** — check the **"Penetration Fix"** option.
 5. Outfitter generates outfit model files for your slider in an `exported_outfit`
    folder. **Replace those generated files with your actual outfit's mesh files**
-   (this is where `sky2cd`'s converted/deformed `.obj` output slots in).
+   (this is where `Sky2Cd`'s converted/deformed `.obj` output slots in).
 6. Export the Character Pack again, then load it in Body Slider Pro to fine-tune the fit.
 
 This confirms `.obj` is exactly the right hand-off format — the mod author explicitly
-ships `.obj` files in their own "Miscellaneous Files," matching what `sky2cd` already
-produces. `sky2cd`'s job is to get a Skyrim mesh into that `exported_outfit`-ready OBJ
+ships `.obj` files in their own "Miscellaneous Files," matching what `Sky2Cd` already
+produces. `Sky2Cd`'s job is to get a Skyrim mesh into that `exported_outfit`-ready OBJ
 shape (right scale, right axes, already roughly conformed) before it goes through Body
 Slider Outfitter's real, engine-accurate refit pass.
 
-**B. Getting cloth/physics working (the part `sky2cd` explicitly cannot do):**
+**B. Getting cloth/physics working (the part `Sky2Cd` explicitly cannot do):**
 
 The author's own explanation, condensed: physics/cloth behavior lives on the mesh's
 *rig/submesh structure*, not something a converter can synthesize. Their technique was a
@@ -595,7 +595,7 @@ The author's own explanation, condensed: physics/cloth behavior lives on the mes
 **Practical, unrelated tip also confirmed by the same mod:** use
 [**Gear Hider**](https://www.nexusmods.com/crimsondesert/mods/554) with a
 `CrimsonDesertEquipHide.ini` preset to hide underwear/shoulder-guard accessories that
-would otherwise clip through a replaced outfit — nothing to do with `sky2cd`, but useful
+would otherwise clip through a replaced outfit — nothing to do with `Sky2Cd`, but useful
 for a clean-looking result.
 
 ### VERIFIED (against the real game + real CrimsonForge source): `sky2cd merge` + CrimsonForge's own rebuild DOES auto-infer weights for new geometry
@@ -623,7 +623,7 @@ differently, and was confirmed to work as follows:
   closest in 3D space.
 - **We ran this for real**: exported the two real donor PACs named in the Dawnbreaker
   mod's own writeup (`cd_phw_00_ub_inner_0003.pac`, `cd_phw_00_lb_00_0145.pac`) straight
-  from the installed game via `VfsManager`, ran a `sky2cd`-converted synthetic outfit
+  from the installed game via `VfsManager`, ran a `Sky2Cd`-converted synthetic outfit
   through `sky2cd merge` logic, appended it onto the donor's real exported `.obj`, and
   called `build_pac()` with **no `.cfmeta.json` sidecar for the merged file at all**.
   - It **succeeded without error**, producing a valid rebuilt `.pac`.
@@ -662,14 +662,14 @@ want full manual control over weight-painting or need a genuinely new bone/skele
 setup — `sky2cd merge` + `build_pac()` is the better choice when you just want the
 verified-working, no-Blender path for merging onto an existing donor's own weight field.
 
-### Recommended end-to-end workflow using `sky2cd`
+### Recommended end-to-end workflow using `Sky2Cd`
 
-1. **Convert with `sky2cd` as usual** (`sky2cd convert outfit.nif --body-config fem-kliff --out out`).
+1. **Convert with `Sky2Cd` as usual** (`sky2cd convert outfit.nif --body-config fem-kliff --out out`).
    This produces `out/outfit.obj` (+ `.mtl`) — Skyrim's mesh, deformed toward the target
    body and axis-converted to Crimson Desert's Y-up (Maya) convention.
 2. **Body-conform it properly** by running that `.obj` through the **Body Slider Pro +
    Body Slider Outfitter** batch-processing workflow above (with "Penetration Fix"
-   checked) — this gets you engine-accurate conforming that `sky2cd`'s own IDW deformer
+   checked) — this gets you engine-accurate conforming that `Sky2Cd`'s own IDW deformer
    only approximates.
 3. **Pick a donor CD item slot to replace** (a compatible existing armor/weapon slot).
    Use **CrimsonForge** to export that donor's real mesh/rig (with `.cfmeta.json`
@@ -697,7 +697,7 @@ runtime. CrimsonForge itself already ships this exact export format (`kind:
 CrimsonForge-generated mod already mounted in a live DMM install -- so this is the
 verified, community-standard target, not a guess.
 
-`sky2cd` now reproduces this same schema directly via `sky2cd.dmm_package` /
+`Sky2Cd` now reproduces this same schema directly via `sky2cd.dmm_package` /
 `sky2cd package-dmm`, so a converted+merged `.pac` can go straight from `sky2cd merge`
 to a droppable DMM mod folder:
 
@@ -731,10 +731,10 @@ recommended default.)
 - It is a **replacer** — the donor item's original look is gone while installed, and it
   can't coexist with another mod replacing the same slot. That matches "1 mod at a time
   per install" exactly.
-- Re-skinning/rig work is manual and per-outfit — `sky2cd` cannot infer bone bindings or
+- Re-skinning/rig work is manual and per-outfit — `Sky2Cd` cannot infer bone bindings or
   auto-solve cloth-rig compatibility; this is genuine 3D-modeling work.
 - CrimsonForge, Body Slider Pro, and Body Slider Outfitter are all separate, independent
-  community tools `sky2cd` does not vendor or depend on — install and run them
+  community tools `Sky2Cd` does not vendor or depend on — install and run them
   separately (except CrimsonForge's donor-export/rebuild step, which can now be fully
   automated -- see the next section).
 
@@ -817,7 +817,7 @@ sky2cd auto-replace-all --input outfit.zip \
 
 Add `--max-workers -1` (or an explicit count like `--max-workers 4`) to rebuild multiple
 pieces' `.pac` files concurrently in separate processes — see "Pipeline performance"
-below for why this helps (CrimsonForge's own rebuild step, not sky2cd's Python code, is
+below for why this helps (CrimsonForge's own rebuild step, not Sky2Cd's Python code, is
 the real per-piece bottleneck) and what it requires in a frozen `.exe` build.
 
 Each `--piece "mesh_selector=donor_id"` picks one converted piece and the donor it gets
@@ -861,7 +861,7 @@ on, then looks it up against the built-in `sky2cd.donor_catalog`:
 
 **Real limitation, by design:** Skyrim's actual body-slot assignment lives in the
 plugin's (`.esp`/`.esl`) `ARMA` record's biped-model bitfield, not the `.nif` mesh file
-itself, and `sky2cd` never reads plugins — only loose mesh archives — so this is always
+itself, and `Sky2Cd` never reads plugins — only loose mesh archives — so this is always
 a best-effort filename guess, never a guaranteed-correct detection. You can still mix
 `--piece` flags for specific pieces with omitting others once explicit `--piece` support
 for partial overrides lands; today, using any `--piece` flag at all switches the whole
@@ -875,14 +875,14 @@ hand donor (2,860 -> 23,730 verts, both submeshes preserved), and CrimsonForge r
 real, loadable 4.6MB `.pac` with a complete 7-file DMM package.
 
 The catalog now also includes 3 new entries sourced from a real, working reference DMM
-mod (not yet donor-merge-tested by `sky2cd` beyond the gloves run above, but live-
+mod (not yet donor-merge-tested by `Sky2Cd` beyond the gloves run above, but live-
 verified to resolve and parse against the current game install): `proxima_ref_feet`
 (`cd_phw_00_foot_0043.pac`), `proxima_ref_hands` (`cd_phw_00_hand_00_0146.pac`, 2
 submeshes), and `proxima_ref_head` (`cd_phw_00_hel_00_0146.pac`, 2 submeshes) — giving
 donor coverage for the feet/hands/head slots in addition to the existing lower/upper
 body donor.
 
-**Real, confirmed constraint (not a bug in `sky2cd` — a genuine PAC format limit),
+**Real, confirmed constraint (not a bug in `Sky2Cd` — a genuine PAC format limit),
 now auto-fixed:** running this against the real Sherwood Huntress mod against the real
 `cd_phw_00_lb_00_0182.pac` donor originally produced a merged mesh with too many
 vertices in one submesh (CrimsonForge's own `build_pac()` packs per-submesh vertex
@@ -931,7 +931,7 @@ that specific edge case.
 (`lz4`, `cryptography` — verified from its real `requirements.txt`), installable via
 `pip install -e ".[crimsonforge]"`; the prebuilt `.exe`s already bundle them.
 `fast_simplification` (used for the vertex-limit fix above) is a regular required
-dependency of `sky2cd` itself (prebuilt Windows wheel, no compiler needed).
+dependency of `Sky2Cd` itself (prebuilt Windows wheel, no compiler needed).
 
 ### Pipeline performance
 
@@ -958,7 +958,7 @@ Python side of the pipeline had a few real bottlenecks, fixed as follows:
   faces), and replaced the old $O(\text{submeshes} \times \text{triangles})$ nested
   loop with an $O(\text{triangles})$ stable-sort + `np.searchsorted` grouping —
   while still preserving **first-seen submesh order** (not numeric id order), since
-  CrimsonForge's own re-import and `sky2cd`'s multi-submesh donor merges depend on
+  CrimsonForge's own re-import and `Sky2Cd`'s multi-submesh donor merges depend on
   that exact ordering. Locked in by a regression test using out-of-order submesh ids.
 
 **Thread-based parallelism across pieces was intentionally skipped**: a thread pool
@@ -967,7 +967,7 @@ dominant cost anyway.
 
 **Process-based parallelism across pieces was implemented**, because CrimsonForge's
 own `build_pac()` full-rebuild step (nearest-vertex skin weight inference + vertex
-quantizing/packing per section — external, CrimsonForge-side work sky2cd cannot patch)
+quantizing/packing per section — external, CrimsonForge-side work Sky2Cd cannot patch)
 dominates real end-to-end time, at roughly 1.5-4 minutes *per piece*, confirmed via
 live process CPU monitoring on real multi-piece batch runs. Since each piece's donor
 lookup + rebuild is fully independent of every other piece, running pieces concurrently
@@ -1004,7 +1004,7 @@ rewrite could otherwise silently break.
 If every Skyrim outfit you convert is built on the **same** reference body (e.g. stock
 CBBE 3BA/3BBB), and you always target the **same** single Crimson Desert body (e.g.
 Fem Kliff), the body-to-body shape difference is a *fixed* deformation field — it does
-not depend on which outfit you're converting. `sky2cd`'s `IDWDeformer` already exploits
+not depend on which outfit you're converting. `Sky2Cd`'s `IDWDeformer` already exploits
 exactly this: it computes a per-vertex displacement between `source_body` and
 `target_body` once, then applies it to any outfit's vertices via inverse-distance
 weighting from the nearest body vertices. This can automate a first fitting pass,
@@ -1165,7 +1165,7 @@ Validation failures (missing file, wrong extension, output path that is a file, 
 
 The command-line tool is unchanged; the GUI is purely additive.
 
-**Nexus Mods listing note:** the Nexus page for sky2cd distributes **only the
+**Nexus Mods listing note:** the Nexus page for Sky2Cd distributes **only the
 GUI standalone executable** (`sky2cd-gui.exe`). The command-line `sky2cd.exe`
 is intentionally not offered as a Nexus download — it remains available to
 advanced/scripted users directly from

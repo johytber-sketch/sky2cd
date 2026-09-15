@@ -9,9 +9,9 @@ from sky2cd.pipeline import convert, pretty_report
 from sky2cd.presets import build_custom_preset, list_presets
 
 WELCOME = """\
-sky2cd - Blender preparation tools for artist-assisted outfit work
+Sky2Cd - Blender preparation tools for artist-assisted outfit work
 
-sky2cd prepares Skyrim outfit geometry for inspection and manual work in Blender. Its
+Sky2Cd prepares Skyrim outfit geometry for inspection and manual work in Blender. Its
 primary output is a preview/mockup, not a fitted, rigged, tested, or game-ready outfit.
 The artist remains responsible for fit, clipping, materials, native rig/weights,
 rebuild/export, and in-game/animation testing.

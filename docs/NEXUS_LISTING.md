@@ -1,6 +1,6 @@
 # Nexus Mods listing guide
 
-This document is the reference copy for sky2cd's Nexus Mods page. It exists
+This document is the reference copy for Sky2Cd's Nexus Mods page. It exists
 so the Nexus-facing wording stays consistent with this repository and stays
 honest about scope. It is **not** auto-published anywhere — copy/paste the
 relevant section into the Nexus page description editor by hand when
@@ -23,7 +23,7 @@ required or equally supported download for typical users, which it is not.
 - No Python install required — `sky2cd-gui.exe` is a self-contained,
   single-file build.
 - Blender, installed separately, to open and work with the preview geometry
-  sky2cd produces. sky2cd does not install, launch, or embed Blender.
+  Sky2Cd produces. Sky2Cd does not install, launch, or embed Blender.
 - Optional, only for live donor verification / resolved in-game names /
   Advanced DMM Packaging: a Crimson Desert install and a separate CrimsonForge
   install. Not required for the primary Blender Prep & Preview workflow.
@@ -37,9 +37,9 @@ adapting it.
 
 ---
 
-**sky2cd — Blender outfit toolkit**
+**Sky2Cd — Blender outfit toolkit**
 
-sky2cd is a Blender preparation toolkit for artist-assisted Skyrim outfit
+Sky2Cd is a Blender preparation toolkit for artist-assisted Skyrim outfit
 work. It converts an outfit's source geometry into a preview/mockup you
 inspect and develop manually in Blender, and it can suggest a ranked donor
 starting point so you don't have to guess cryptic in-game item IDs by hand.

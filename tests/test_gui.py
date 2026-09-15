@@ -15,7 +15,7 @@ from sky2cd import gui
 
 
 def test_gui_branding_centers_blender_preview_workflow():
-    assert gui.APP_TITLE == "Sky2CD Blender Assistant & Preview Tools"
+    assert gui.APP_TITLE == "Sky2Cd Blender Assistant & Preview Tools"
     assert "artist review required" in gui.AUTO_DONOR_LABEL
 
 

@@ -32,7 +32,7 @@ from sky2cd.presets import (
 )
 from sky2cd.settings import UserSettings, load_settings, save_settings
 
-APP_TITLE = "Sky2CD Blender Assistant & Preview Tools"
+APP_TITLE = "Sky2Cd Blender Assistant & Preview Tools"
 CUSTOM_CONFIG_LABEL = "Custom body-config JSON..."
 AUTO_DONOR_LABEL = "Auto-select by inferred slot (artist review required)"
 
@@ -537,7 +537,7 @@ def validate_merge_inputs(
     if not donor_path.strip():
         raise ValidationError("Choose a donor item .obj (e.g. exported from CrimsonForge).")
     if not outfit_path.strip():
-        raise ValidationError("Choose a converted outfit .obj (from a prior sky2cd conversion).")
+        raise ValidationError("Choose a converted outfit .obj (from a prior Sky2Cd conversion).")
     if not out_path.strip():
         raise ValidationError("Choose an output path for the merged .obj.")
 
@@ -770,7 +770,7 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
 
         header = ttk.Frame(main_container)
         header.pack(fill="x", pady=(0, 12))
-        ttk.Label(header, text="Sky2CD", style="Heading.TLabel", font=(self._base_font_family, 18, "bold")).pack(
+        ttk.Label(header, text="Sky2Cd", style="Heading.TLabel", font=(self._base_font_family, 18, "bold")).pack(
             side="left"
         )
         ttk.Label(
@@ -857,7 +857,7 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
         self.log.configure(yscrollcommand=scroll.set)
 
         self._log(
-            "Sky2CD ready.\n"
+            "Sky2Cd ready.\n"
             "• Blender Prep & Preview: convert source geometry for artist inspection in Blender.\n"
             "  Output is a preview/mockup, not a fitted, rigged, or game-ready outfit.\n"
             "• Advanced DMM Packaging: optional experimental tooling for an artist-rebuilt,\n"
@@ -2054,7 +2054,7 @@ class _LegacySky2cdApp:  # pragma: no cover - requires a display to exercise
         self.log.configure(yscrollcommand=scroll.set)
 
         self._log(
-            "sky2cd GUI ready.\n"
+            "Sky2Cd GUI ready.\n"
             "Built-in body presets: Fem Kliff (Default) & CD Vanilla Female.\n"
             "PAC output is experimental and unverified against real Crimson Desert files.\n"
             ".nif input requires your own PyNifly installation on PYTHONPATH.\n"

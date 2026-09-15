@@ -60,7 +60,7 @@ def test_user_guide_documents_key_workflows_and_boundary():
 
     # Troubleshooting coverage.
     assert "SmartScreen" in guide
-    assert "Fully close every open Sky2CD window" in guide
+    assert "Fully close every open Sky2Cd window" in guide
     assert "CrimsonForge" in guide
 
     # Honest boundary language, not marketing claims.
@@ -98,4 +98,32 @@ def test_nexus_listing_guide_attaches_gui_only_and_keeps_boundary():
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     assert "docs/NEXUS_LISTING.md" in readme
     assert "only the" in readme.lower() and "sky2cd-gui.exe" in readme
+
+
+def test_visible_branding_is_sky2cd_mixed_case_while_identifiers_stay_lowercase():
+    """Public-facing prose says "Sky2Cd"; technical identifiers stay exactly "sky2cd"."""
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    guide = (ROOT / "docs" / "USER_GUIDE.md").read_text(encoding="utf-8")
+    listing = (ROOT / "docs" / "NEXUS_LISTING.md").read_text(encoding="utf-8")
+
+    # Visible product-name prose/headings use the "Sky2Cd" branding.
+    assert readme.startswith("# Sky2Cd")
+    assert "`Sky2Cd` is a Blender preparation toolkit" in readme
+    assert guide.splitlines()[0] == "# Sky2Cd user guide"
+    assert "**Sky2Cd — Blender outfit toolkit**" in listing
+
+    # Technical identifiers that must never be re-cased.
+    assert "sky2cd blender-handoff" in readme
+    assert "sky2cd donors --suggest" in readme
+    assert "sky2cd.exe" in readme and "sky2cd-gui.exe" in readme
+    assert "johytber-sketch/sky2cd" in readme or "github.com" in readme  # repo references stay lowercase
+    assert "~/.sky2cd/settings.json" in readme
+
+    from sky2cd import gui as gui_mod
+    from sky2cd.cli import WELCOME
+
+    assert gui_mod.APP_TITLE == "Sky2Cd Blender Assistant & Preview Tools"
+    assert "Sky2Cd - Blender preparation tools" in WELCOME
+    assert "sky2cd blender-handoff --input <outfit.zip>" in WELCOME
+    assert "sky2cd convert <outfit.nif" in WELCOME
 

@@ -1,18 +1,18 @@
-# sky2cd user guide
+# Sky2Cd user guide
 
 A practical, no-hype guide to installing and using sky2cd. For a shorter
 placeholder-only walkthrough, see [`EXAMPLE_WORKFLOW.md`](EXAMPLE_WORKFLOW.md).
 For licensing details and the current release blocker, see
 [`THIRD_PARTY_NOTICES.md`](../THIRD_PARTY_NOTICES.md).
 
-## What sky2cd is
+## What Sky2Cd is
 
 A Blender preparation toolkit for artist-assisted Skyrim-to-Crimson-Desert
 outfit work. It converts an outfit's source geometry into a preview/mockup you
 inspect and develop manually in Blender, and it can rank donor candidates so
 you don't have to guess cryptic catalog IDs by hand.
 
-## What sky2cd is not
+## What Sky2Cd is not
 
 - Not an automatic Skyrim-outfit-to-game-ready-Crimson-Desert converter.
 - Not a body-fitting, clipping-correction, or weight-painting tool — those
@@ -24,7 +24,7 @@ you don't have to guess cryptic catalog IDs by hand.
 
 ## Download and install
 
-**If you're getting sky2cd from Nexus Mods:** download **only the GUI
+**If you're getting Sky2Cd from Nexus Mods:** download **only the GUI
 standalone executable**, `sky2cd-gui.exe`. That is the only file the Nexus
 page distributes and the only one most users need — double-click it and go.
 The command-line tool is intentionally not offered as a Nexus download; it
@@ -47,8 +47,8 @@ Requirements to just run the exe:
 
 Requirements only for specific optional steps (see below), not for launching
 the tool itself:
-- **Blender**, to actually open and work with the preview geometry sky2cd
-  produces. sky2cd never launches or embeds Blender.
+- **Blender**, to actually open and work with the preview geometry Sky2Cd
+  produces. Sky2Cd never launches or embeds Blender.
 - **A Crimson Desert install and a separate CrimsonForge install**, only for
   live donor verification, resolved in-game display names, and Advanced DMM
   Packaging. The core Blender Prep & Preview workflow works fully without
@@ -74,7 +74,7 @@ bottom status bar toggles the theme immediately (no restart needed) and
 remembers your choice in `~/.sky2cd/settings.json` for next time.
 
 If you see nothing change after relaunching a newly downloaded/rebuilt exe,
-fully close every existing Sky2CD window first — an old window left open from
+fully close every existing Sky2Cd window first — an old window left open from
 before can look identical to a new one and hide any update.
 
 ## The GUI at a glance
@@ -109,7 +109,7 @@ before can look identical to a new one and hide any update.
    `source.obj`) in Blender.
 7. In Blender: inspect topology and scale, fit the garment to the target
    body, resolve clipping, review materials, transfer or paint weights
-   against the correct native rig, and test poses/animations. sky2cd does
+   against the correct native rig, and test poses/animations. Sky2Cd does
    not do any of this for you.
 
 Command-line equivalent (advanced/scripted use, GitHub-only `sky2cd.exe` —
@@ -227,7 +227,7 @@ standalone `.exe` (no Python needed), or install Python and run
 `pip install -e .[dev]` first.
 
 **Nothing changed after I re-downloaded/rebuilt the GUI exe.**
-Fully close every open Sky2CD window before relaunching. A leftover window
+Fully close every open Sky2Cd window before relaunching. A leftover window
 from an earlier run looks identical to a new one and can make an update seem
 like it didn't apply. On Windows you can confirm no copies are running via
 Task Manager (look for `sky2cd-gui.exe`).
@@ -239,7 +239,7 @@ trust the source.
 **Blender isn't installed / I don't have it yet.**
 The Blender Prep & Preview step still produces `source.obj` and
 `metadata.json` without Blender installed — you just need Blender separately
-to open and work with them. sky2cd does not install or require Blender to run.
+to open and work with them. Sky2Cd does not install or require Blender to run.
 
 **I don't have a CrimsonForge or game `packages` folder configured.**
 That's fine for the primary Blender workflow — leave those fields empty. They

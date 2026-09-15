@@ -36,11 +36,11 @@ CrimsonForge is not vendored. Optional live donor inspection loads a separate
 user-installed copy from
 [hzeemr/crimsonforge](https://github.com/hzeemr/crimsonforge). Its repository
 identifies the project as MIT licensed. No CrimsonForge code or game assets are
-included in sky2cd distributions.
+included in Sky2Cd distributions.
 
 ## User-provided assets
 
-sky2cd does not grant rights to Skyrim, Crimson Desert, or third-party mod
+Sky2Cd does not grant rights to Skyrim, Crimson Desert, or third-party mod
 assets. Documentation examples use placeholders only. Users must supply their
 own lawfully obtained files and must review the permissions for every source
 asset and resulting work.
