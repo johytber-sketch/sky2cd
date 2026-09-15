@@ -100,6 +100,43 @@ def test_nexus_listing_guide_attaches_gui_only_and_keeps_boundary():
     assert "only the" in readme.lower() and "sky2cd-gui.exe" in readme
 
 
+def test_readme_uses_collapsible_sections_for_information_architecture():
+    """The landing page stays scannable: short top intro, long material collapsed."""
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+
+    assert readme.count("<details") == readme.count("</details>")
+    assert readme.count("<details") == 10
+
+    expected_summaries = [
+        "What Sky2Cd does and does not do",
+        "Quick start / Blender workflow",
+        "Donor suggestions and JSON",
+        "Optional CrimsonForge / DMM workflow",
+        "GUI features",
+        "Troubleshooting",
+        "Technical safety notes / geometry history",
+        "Developer / CLI workflow",
+        "Licensing and third-party notices",
+        "More documentation",
+    ]
+    for summary in expected_summaries:
+        assert f"<summary><b>{summary}</b></summary>" in readme
+
+    # Every <summary> must be followed by a blank line for GitHub to render the
+    # Markdown inside the <details> block instead of raw text.
+    lines = readme.splitlines()
+    for index, line in enumerate(lines):
+        if line.startswith("<summary>"):
+            assert lines[index + 1] == ""
+
+    # The short top intro (before the first collapsible section) still carries the
+    # download link, requirements, and the honest limitation statement.
+    top = readme.split("<details", 1)[0]
+    assert "**Download:**" in top
+    assert "**Requirements:**" in top
+    assert "**Honest limitation:**" in top
+
+
 def test_visible_branding_is_sky2cd_mixed_case_while_identifiers_stay_lowercase():
     """Public-facing prose says "Sky2Cd"; technical identifiers stay exactly "sky2cd"."""
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
