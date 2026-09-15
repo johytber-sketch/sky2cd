@@ -783,7 +783,10 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
         # tabs above and the status/log area below, resizing either one -
         # the log panel is no longer a fixed height. A plain tk.PanedWindow
         # (not ttk) is used here because it exposes a thicker, easier-to-grab
-        # sash than ttk's hairline-thin Panedwindow sash.
+        # sash than ttk's hairline-thin Panedwindow sash. opaqueresize=False
+        # draws a thin outline while dragging and only resizes the real
+        # widgets on release, avoiding the smeared/streaked repaint glitch
+        # that live (opaque) resizing of a ttk.Notebook + tk.Text can cause.
         self.main_paned = tk.PanedWindow(
             main_container,
             orient="vertical",
@@ -791,12 +794,15 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
             sashrelief="flat",
             sashpad=0,
             borderwidth=0,
-            opaqueresize=True,
+            opaqueresize=False,
         )
         self.main_paned.pack(fill="both", expand=True)
 
         top_pane = ttk.Frame(self.main_paned)
-        self.main_paned.add(top_pane, stretch="always", minsize=240, height=520)
+        # A generous minsize keeps the tabs area from being dragged down to
+        # a sliver - the log can be resized for more room, but not so far
+        # that it swallows the whole window.
+        self.main_paned.add(top_pane, stretch="always", minsize=360, height=520)
 
         self.notebook = ttk.Notebook(top_pane)
         self.notebook.pack(fill="both", expand=True)
@@ -813,7 +819,7 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
 
         # Bottom Area: Progress, Status & Log (shared across tabs)
         bottom_frame = ttk.Frame(self.main_paned, padding=(0, 14, 0, 0))
-        self.main_paned.add(bottom_frame, stretch="always", minsize=90, height=190)
+        self.main_paned.add(bottom_frame, stretch="always", minsize=110, height=190)
 
         self.progress = ttk.Progressbar(bottom_frame, mode="indeterminate")
         self.progress.pack(fill="x", pady=(0, 8))
