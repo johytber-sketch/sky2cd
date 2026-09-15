@@ -24,19 +24,24 @@ you don't have to guess cryptic catalog IDs by hand.
 
 ## Download and install
 
-Two standalone Windows executables are attached to each
-[GitHub release](https://github.com/johytber-sketch/sky2cd/releases):
+**If you're getting sky2cd from Nexus Mods:** download **only the GUI
+standalone executable**, `sky2cd-gui.exe`. That is the only file the Nexus
+page distributes and the only one most users need — double-click it and go.
+The command-line tool is intentionally not offered as a Nexus download; it
+remains available to advanced users directly from
+[GitHub releases](https://github.com/johytber-sketch/sky2cd/releases) for
+scripting or CI use, alongside the same GUI exe.
 
-| File | What it is |
-| --- | --- |
-| `sky2cd-gui.exe` | Desktop GUI, no console window |
-| `sky2cd.exe` | Command-line tool |
+| File | Where to get it | What it is |
+| --- | --- | --- |
+| `sky2cd-gui.exe` | Nexus Mods **or** GitHub releases | Desktop GUI, no console window — the file most users want |
+| `sky2cd.exe` | GitHub releases only (not on Nexus) | Command-line tool for advanced/scripted use |
 
 Both are single-file builds that already contain the Python interpreter and
 every Python dependency. **You do not need to install Python separately to
 run either exe.**
 
-Requirements to just run the exes:
+Requirements to just run the exe:
 - 64-bit Windows 10 or 11.
 - No separate Python install, no `pip install`.
 
@@ -107,7 +112,8 @@ before can look identical to a new one and hide any update.
    against the correct native rig, and test poses/animations. sky2cd does
    not do any of this for you.
 
-Command-line equivalent:
+Command-line equivalent (advanced/scripted use, GitHub-only `sky2cd.exe` —
+not distributed on Nexus):
 
 ```powershell
 sky2cd blender-handoff --input outfit.zip --out .\handoff_out
@@ -123,9 +129,12 @@ Each piece folder under `handoff_out\handoff\` contains:
 
 Instead of manually decoding cryptic donor catalog IDs, ask for a ranked
 recommendation. This is entirely optional and never required for the
-Blender workflow above.
+Blender workflow above. **Nexus users:** use the GUI's **Suggest donor**
+button described below — the terminal/JSON commands in this section are the
+`sky2cd.exe` command-line tool, which is only distributed via GitHub
+releases, not Nexus.
 
-**Terminal, quick read:**
+**Terminal, quick read (GitHub `sky2cd.exe`):**
 
 ```powershell
 sky2cd donors --suggest Dress_1.nif
@@ -189,7 +198,10 @@ bundled with sky2cd.
 ## Optional: Advanced DMM Packaging
 
 Only after an artist has independently rebuilt and validated a `.pac` outside
-sky2cd:
+sky2cd. This is an advanced/experimental step; the packaging command shown
+here is part of the GitHub-only `sky2cd.exe` command-line tool (the GUI's
+**Advanced DMM Packaging** tab exposes the same packaging options for GUI
+users, whether they got the GUI exe from Nexus or GitHub):
 
 ```powershell
 sky2cd package-dmm --strict `

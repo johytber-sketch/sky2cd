@@ -68,3 +68,34 @@ def test_user_guide_documents_key_workflows_and_boundary():
     assert "game-ready" in guide
     assert "THIRD_PARTY_NOTICES.md" in guide
 
+
+def test_user_guide_scopes_nexus_download_to_gui_only():
+    guide = (ROOT / "docs" / "USER_GUIDE.md").read_text(encoding="utf-8")
+
+    assert "Nexus" in guide
+    assert "not on Nexus" in guide or "not distributed on Nexus" in guide or "not offered as a Nexus download" in guide
+    assert "GitHub releases only" in guide or "GitHub-only" in guide
+
+
+def test_nexus_listing_guide_attaches_gui_only_and_keeps_boundary():
+    listing = (ROOT / "docs" / "NEXUS_LISTING.md").read_text(encoding="utf-8")
+
+    # Only the GUI exe should be described as the Nexus download.
+    assert "Attach only `sky2cd-gui.exe`" in listing
+    assert "Do not upload `sky2cd.exe`" in listing
+
+    # Requirements stay honest: no Python needed, Blender/CrimsonForge separate.
+    assert "No Python install required" in listing
+    assert "Blender" in listing
+    assert "CrimsonForge" in listing
+
+    # No unsupported/marketing claims about automatic conversion.
+    assert "does not automatically fit a body" in listing
+    assert "never a" in listing
+    assert "game-ready" in listing
+
+    # README links to it and repeats the same GUI-only Nexus scoping.
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert "docs/NEXUS_LISTING.md" in readme
+    assert "only the" in readme.lower() and "sky2cd-gui.exe" in readme
+

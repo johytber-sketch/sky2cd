@@ -1165,6 +1165,14 @@ Validation failures (missing file, wrong extension, output path that is a file, 
 
 The command-line tool is unchanged; the GUI is purely additive.
 
+**Nexus Mods listing note:** the Nexus page for sky2cd distributes **only the
+GUI standalone executable** (`sky2cd-gui.exe`). The command-line `sky2cd.exe`
+is intentionally not offered as a Nexus download — it remains available to
+advanced/scripted users directly from
+[GitHub releases](https://github.com/johytber-sketch/sky2cd/releases). See
+[`docs/NEXUS_LISTING.md`](docs/NEXUS_LISTING.md) for the exact listing
+copy/BBCode used on Nexus.
+
 ## Build standalone Windows executables
 
 Install the build extra and run the PyInstaller wrapper:
