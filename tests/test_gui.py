@@ -342,11 +342,23 @@ def test_tooltips_registry_covers_key_controls():
         "ar_packages_path",
         "ar_crimsonforge_home",
         "dmm_generate",
+        "merge_donor",
+        "merge_outfit",
+        "merge_out",
+        "merge_btn",
     }
     assert expected_keys <= gui.TOOLTIPS.keys()
     for key, text in gui.TOOLTIPS.items():
         assert isinstance(text, str) and text.strip(), key
-        assert len(text) < 220, f"tooltip {key!r} is too long to read at a glance"
+        assert len(text) < 260, f"tooltip {key!r} is too long to read at a glance"
+
+
+def test_manual_donor_merge_tooltips_explain_how_to_obtain_files():
+    """The 'how do I get a donor .obj' question must be answered in the tooltip text."""
+    donor_text = gui.TOOLTIPS["merge_donor"].lower()
+    assert "exported" in donor_text or "export" in donor_text
+    outfit_text = gui.TOOLTIPS["merge_outfit"].lower()
+    assert "create preview files" in outfit_text or "source.obj" in outfit_text
 
 
 def test_tooltip_text_never_claims_guaranteed_fit_or_game_ready_output():

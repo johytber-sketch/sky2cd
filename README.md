@@ -1126,10 +1126,14 @@ light theme; the preference is remembered the next time the GUI opens.
 
 **Hover tooltips & layout:** the most confusing controls (input picker, output folder,
 Create Preview Files, Suggest donor, Open JSON folder, the Dark mode toggle, body
-preset/custom config, and the DMM packaging path/CrimsonForge fields) show a short
-hover tooltip explaining what they do and, where relevant, restating that donor
-suggestions are a starting point only. Section headings and grouped "card" panels
-(e.g. Game & Tool Paths) give the window clearer visual structure in both themes.
+preset/custom config, the Manual Donor Merge fields, and the DMM packaging
+path/CrimsonForge fields) show a short hover tooltip explaining what they do and,
+where relevant, restating that donor suggestions/merges are a starting point only —
+e.g. the Manual Donor Merge tooltips explain where the donor `.obj` and outfit `.obj`
+come from (a donor export/Blender scene and the `source.obj` from Create Preview
+Files, respectively). The window uses a larger, modern flat layout: pill-style tabs,
+a bigger default size, section headings, borderless "card" panels (e.g. Game & Tool
+Paths), and an accent-colored primary action button, in both light and dark themes.
 
 ```powershell
 pip install -e .[dev]

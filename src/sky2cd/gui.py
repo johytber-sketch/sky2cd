@@ -182,6 +182,14 @@ TOOLTIPS: dict[str, str] = {
     "dmm_generate": "Builds an experimental DMM package from an artist-rebuilt donor. Does not certify a "
     "wearable or game-ready result on its own.",
     "dmm_open_folder": "Open the folder containing the generated DMM package.",
+    "merge_donor": "A donor body/armor part's raw .obj mesh, exported from the actual game/CrimsonForge or from "
+    "a Blender scene you built around a Suggest donor recommendation. This is not auto-fetched.",
+    "merge_outfit": "The outfit piece .obj produced by 'Create Preview Files' above (source.obj in its output "
+    "folder), or another .obj you've prepared in Blender.",
+    "merge_out": "Where the merged .obj is written. Still a preview mesh: re-check fit, clipping, and weights "
+    "in Blender before treating it as game-ready.",
+    "merge_btn": "Combines the two .obj files into one mesh for further Blender work. Does not rig, weight, "
+    "or validate fit/clipping/animation.",
 }
 
 
@@ -642,8 +650,29 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
 
         self.root = tk.Tk()
         self.root.title(APP_TITLE)
-        self.root.minsize(820, 680)
+        self.root.minsize(920, 760)
+        self.root.geometry("960x800")
         self.root.report_callback_exception = self._report_callback_exception
+
+        # Modern default typeface for a 2026 look; falls back gracefully if
+        # "Segoe UI Variable" isn't installed (older Windows/Linux/macOS).
+        self._base_font_family = "Segoe UI Variable Text"
+        try:
+            import tkinter.font as tkfont
+
+            if self._base_font_family not in tkfont.families(self.root):
+                self._base_font_family = "Segoe UI"
+        except Exception:
+            self._base_font_family = "Segoe UI"
+        self._base_font = (self._base_font_family, 10)
+        try:
+            import tkinter.font as tkfont
+
+            tkfont.nametofont("TkDefaultFont").configure(family=self._base_font_family, size=10)
+            tkfont.nametofont("TkTextFont").configure(family=self._base_font_family, size=10)
+            tkfont.nametofont("TkHeadingFont").configure(family=self._base_font_family, size=10, weight="bold")
+        except Exception:
+            pass
 
         # Auto-detect game paths and crimsonforge
         detected_cf = find_crimsonforge_home(self.settings.crimsonforge_home or None)
@@ -736,15 +765,17 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
 
     def _build_widgets(self) -> None:
         tk, ttk = self._tk, self._ttk
-        main_container = ttk.Frame(self.root, padding=12)
+        main_container = ttk.Frame(self.root, padding=16)
         main_container.pack(fill="both", expand=True)
 
         header = ttk.Frame(main_container)
-        header.pack(fill="x", pady=(0, 8))
-        ttk.Label(header, text="Sky2CD", style="Heading.TLabel", font=("Segoe UI", 14, "bold")).pack(side="left")
+        header.pack(fill="x", pady=(0, 12))
+        ttk.Label(header, text="Sky2CD", style="Heading.TLabel", font=(self._base_font_family, 18, "bold")).pack(
+            side="left"
+        )
         ttk.Label(
             header,
-            text="  Blender-first outfit prep, donor suggestions & optional DMM packaging",
+            text="   Blender-first outfit prep · donor suggestions · optional DMM packaging",
             style="Muted.TLabel",
         ).pack(side="left")
 
@@ -752,28 +783,30 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
         self.notebook.pack(fill="both", expand=True)
 
         # TAB 1: Blender-preview preparation
-        self.tab_raw = ttk.Frame(self.notebook, padding=12)
-        self.notebook.add(self.tab_raw, text="Blender Prep & Preview")
+        self.tab_raw = ttk.Frame(self.notebook, padding=18)
+        self.notebook.add(self.tab_raw, text="  Blender Prep & Preview  ")
         self._build_raw_tab(self.tab_raw)
 
         # TAB 2: Optional experimental packaging
-        self.tab_dmm = ttk.Frame(self.notebook, padding=12)
-        self.notebook.add(self.tab_dmm, text="Advanced DMM Packaging (Experimental)")
+        self.tab_dmm = ttk.Frame(self.notebook, padding=18)
+        self.notebook.add(self.tab_dmm, text="  Advanced DMM Packaging (Experimental)  ")
         self._build_dmm_tab(self.tab_dmm)
 
         # Bottom Area: Progress, Status & Log (shared across tabs)
-        bottom_frame = ttk.Frame(main_container, padding=(0, 10, 0, 0))
+        bottom_frame = ttk.Frame(main_container, padding=(0, 14, 0, 0))
         bottom_frame.pack(fill="both", expand=True)
 
         self.progress = ttk.Progressbar(bottom_frame, mode="indeterminate")
-        self.progress.pack(fill="x", pady=(0, 6))
+        self.progress.pack(fill="x", pady=(0, 8))
 
         status_bar = ttk.Frame(bottom_frame)
-        status_bar.pack(fill="x", pady=(0, 6))
-        ttk.Label(status_bar, textvariable=self.status_var, font=("Segoe UI", 9, "bold")).pack(side="left")
+        status_bar.pack(fill="x", pady=(0, 8))
+        ttk.Label(status_bar, textvariable=self.status_var, font=(self._base_font_family, 10, "bold")).pack(
+            side="left"
+        )
         self.dark_mode_check = ttk.Checkbutton(
             status_bar,
-            text="Dark mode",
+            text="🌙 Dark mode",
             variable=self.dark_mode_var,
             command=self._on_toggle_theme,
         )
@@ -787,9 +820,11 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
             height=10,
             wrap="word",
             state="disabled",
-            font=("Consolas", 9),
+            font=("Cascadia Mono", 9),
             borderwidth=1,
-            relief="solid",
+            relief="flat",
+            padx=8,
+            pady=6,
         )
         self.log.pack(side="left", fill="both", expand=True)
         scroll = ttk.Scrollbar(log_frame, orient="vertical", command=self.log.yview)
@@ -823,86 +858,134 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
         except Exception:
             pass  # "clam" ships with CPython's Tk; fall back to whatever is active
 
-        style.configure(".", background=palette["bg"], foreground=palette["fg"])
+        style.configure(".", background=palette["bg"], foreground=palette["fg"], font=self._base_font)
         style.configure("TFrame", background=palette["bg"])
         style.configure("TLabel", background=palette["bg"], foreground=palette["fg"])
-        style.configure("TLabelframe", background=palette["bg"], foreground=palette["fg"])
-        style.configure("TLabelframe.Label", background=palette["bg"], foreground=palette["fg"])
-        style.configure("TButton", background=palette["button_bg"], foreground=palette["fg"])
+        style.configure(
+            "TLabelframe",
+            background=palette["card_bg"],
+            foreground=palette["fg"],
+            bordercolor=palette["border"],
+            relief="flat",
+            borderwidth=1,
+        )
+        style.configure("TLabelframe.Label", background=palette["card_bg"], foreground=palette["heading_fg"])
+        style.configure(
+            "TButton",
+            background=palette["button_bg"],
+            foreground=palette["fg"],
+            borderwidth=0,
+            focuscolor=palette["bg"],
+            padding=(14, 8),
+        )
         style.map(
             "TButton",
-            background=[("active", palette["accent"]), ("disabled", palette["button_bg"])],
-            foreground=[("disabled", palette["fg"])],
+            background=[("active", palette["select_bg"]), ("disabled", palette["button_bg"])],
+            foreground=[("disabled", palette["muted_fg"])],
         )
-        style.configure("TCheckbutton", background=palette["bg"], foreground=palette["fg"])
+        style.configure(
+            "TCheckbutton",
+            background=palette["bg"],
+            foreground=palette["fg"],
+            focuscolor=palette["bg"],
+        )
         style.map("TCheckbutton", background=[("active", palette["bg"])])
-        style.configure("TNotebook", background=palette["bg"], bordercolor=palette["bg"])
-        style.configure("TNotebook.Tab", background=palette["button_bg"], foreground=palette["fg"])
+        style.configure("TNotebook", background=palette["bg"], borderwidth=0, tabmargins=(0, 8, 0, 0))
+        style.configure(
+            "TNotebook.Tab",
+            background=palette["bg"],
+            foreground=palette["muted_fg"],
+            padding=(20, 10),
+            font=(self._base_font_family, 10, "bold"),
+            borderwidth=0,
+            focuscolor=palette["bg"],
+        )
         style.map(
             "TNotebook.Tab",
-            background=[("selected", palette["accent"])],
-            foreground=[("selected", palette["fg"])],
+            background=[("selected", palette["accent"]), ("!selected", palette["card_bg"])],
+            foreground=[("selected", palette["accent_fg"]), ("!selected", palette["muted_fg"])],
         )
         style.configure(
             "TEntry",
             fieldbackground=palette["entry_bg"],
             foreground=palette["entry_fg"],
             insertcolor=palette["fg"],
+            bordercolor=palette["border"],
+            lightcolor=palette["border"],
+            darkcolor=palette["border"],
+            borderwidth=1,
+            relief="flat",
+            padding=(8, 6),
         )
         style.configure(
             "TCombobox",
             fieldbackground=palette["entry_bg"],
             foreground=palette["entry_fg"],
             background=palette["button_bg"],
+            bordercolor=palette["border"],
+            arrowcolor=palette["fg"],
+            borderwidth=1,
+            relief="flat",
+            padding=(6, 4),
         )
         style.map(
             "TCombobox",
             fieldbackground=[("readonly", palette["entry_bg"])],
             foreground=[("readonly", palette["entry_fg"])],
         )
-        style.configure("Horizontal.TProgressbar", background=palette["accent"], troughcolor=palette["button_bg"])
-        style.configure("TScrollbar", background=palette["button_bg"], troughcolor=palette["bg"])
+        style.configure(
+            "Horizontal.TProgressbar",
+            background=palette["accent"],
+            troughcolor=palette["card_bg"],
+            borderwidth=0,
+            thickness=8,
+        )
+        style.configure("TScrollbar", background=palette["button_bg"], troughcolor=palette["bg"], borderwidth=0)
         style.configure("TSeparator", background=palette["border"])
 
         # Modern-polish styles: section headings, grouped "card" frames, and
-        # a primary/accent button style for the main preview action.
+        # a primary/accent button style for the main preview action. Kept
+        # flat (no groove/ridge relief) with generous padding for a less
+        # dated look while staying pure ttk/tk (no extra GUI framework).
         style.configure(
             "Heading.TLabel",
             background=palette["bg"],
             foreground=palette["heading_fg"],
-            font=("Segoe UI", 11, "bold"),
+            font=(self._base_font_family, 13, "bold"),
         )
         style.configure(
             "Muted.TLabel",
             background=palette["bg"],
             foreground=palette["muted_fg"],
-            font=("Segoe UI", 8),
+            font=(self._base_font_family, 9),
         )
         style.configure(
             "Card.TLabelframe",
             background=palette["card_bg"],
             bordercolor=palette["border"],
-            relief="groove",
+            relief="flat",
+            borderwidth=1,
         )
         style.configure(
             "Card.TLabelframe.Label",
             background=palette["card_bg"],
             foreground=palette["heading_fg"],
-            font=("Segoe UI", 9, "bold"),
+            font=(self._base_font_family, 10, "bold"),
         )
         style.configure(
             "Accent.TButton",
             background=palette["accent"],
             foreground=palette["accent_fg"],
-            font=("Segoe UI", 9, "bold"),
-            padding=(10, 6),
+            font=(self._base_font_family, 10, "bold"),
+            padding=(18, 10),
+            borderwidth=0,
+            focuscolor=palette["accent"],
         )
         style.map(
             "Accent.TButton",
             background=[("active", palette["accent"]), ("disabled", palette["button_bg"])],
             foreground=[("disabled", palette["muted_fg"])],
         )
-        style.configure("TButton", padding=(8, 4))
 
         # Combobox dropdown listboxes are plain Tk widgets and aren't styled by ttk.Style.
         self.root.option_add("*TCombobox*Listbox.background", palette["entry_bg"])
@@ -917,6 +1000,9 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
                 foreground=palette["log_fg"],
                 insertbackground=palette["fg"],
                 selectbackground=palette["select_bg"],
+                highlightthickness=1,
+                highlightbackground=palette["border"],
+                highlightcolor=palette["border"],
             )
         self._dark_mode = dark
         self._palette = palette
@@ -948,31 +1034,31 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
         self._file_row(parent, 2, "Skyrim Outfit (.7z/.zip/.nif):", self.ar_input_var, self._browse_ar_input, "ar_input")
 
         # Row 3: Target Body Preset
-        ttk.Label(parent, text="Body Target Preset:").grid(row=3, column=0, sticky="w", pady=4)
+        ttk.Label(parent, text="Body Target Preset:").grid(row=3, column=0, sticky="w", pady=6)
         self.ar_preset_combo = ttk.Combobox(
             parent,
             textvariable=self.ar_preset_var,
             values=preset_labels(),
             state="readonly",
         )
-        self.ar_preset_combo.grid(row=3, column=1, columnspan=2, sticky="ew", padx=(6, 0), pady=4)
+        self.ar_preset_combo.grid(row=3, column=1, columnspan=2, sticky="ew", padx=(6, 0), pady=6)
         self.ar_preset_combo.bind("<<ComboboxSelected>>", self._on_ar_preset_change)
         self._tip(self.ar_preset_combo, "ar_preset")
 
         # Row 4: Custom config (hidden/disabled unless chosen)
-        ttk.Label(parent, text="Custom Body Config:").grid(row=4, column=0, sticky="w", pady=4)
+        ttk.Label(parent, text="Custom Body Config:").grid(row=4, column=0, sticky="w", pady=6)
         self.ar_custom_entry = ttk.Entry(parent, textvariable=self.ar_custom_config_var, state="disabled")
-        self.ar_custom_entry.grid(row=4, column=1, sticky="ew", padx=6, pady=4)
+        self.ar_custom_entry.grid(row=4, column=1, sticky="ew", padx=6, pady=6)
         self.ar_custom_btn = ttk.Button(parent, text="Browse...", command=self._browse_ar_config, state="disabled")
-        self.ar_custom_btn.grid(row=4, column=2, sticky="w", pady=4)
+        self.ar_custom_btn.grid(row=4, column=2, sticky="w", pady=6)
 
         # Row 5: Donor suggestion input and action
-        ttk.Label(parent, text="Piece name/file for suggestion:").grid(row=5, column=0, sticky="w", pady=4)
+        ttk.Label(parent, text="Piece name/file for suggestion:").grid(row=5, column=0, sticky="w", pady=6)
         suggest_entry = ttk.Entry(parent, textvariable=self.ar_suggest_piece_var)
-        suggest_entry.grid(row=5, column=1, sticky="ew", padx=6, pady=4)
+        suggest_entry.grid(row=5, column=1, sticky="ew", padx=6, pady=6)
         self._tip(suggest_entry, "suggest_piece")
         suggest_actions = ttk.Frame(parent)
-        suggest_actions.grid(row=5, column=2, sticky="w", pady=4)
+        suggest_actions.grid(row=5, column=2, sticky="w", pady=6)
         self.suggest_donor_btn = ttk.Button(
             suggest_actions,
             text="Suggest donor",
@@ -990,14 +1076,14 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
         self._tip(self.suggestion_open_btn, "suggestion_open_folder")
 
         # Row 6: Optional donor target selected by the recommendation or user
-        ttk.Label(parent, text="Optional donor starting target:").grid(row=6, column=0, sticky="w", pady=4)
+        ttk.Label(parent, text="Optional donor starting target:").grid(row=6, column=0, sticky="w", pady=6)
         self.ar_donor_combo = ttk.Combobox(
             parent,
             textvariable=self.ar_donor_var,
             values=donor_labels(),
             state="readonly",
         )
-        self.ar_donor_combo.grid(row=6, column=1, columnspan=2, sticky="ew", padx=(6, 0), pady=4)
+        self.ar_donor_combo.grid(row=6, column=1, columnspan=2, sticky="ew", padx=(6, 0), pady=6)
         self._tip(self.ar_donor_combo, "ar_donor")
 
         ttk.Label(
@@ -1007,8 +1093,8 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
         ).grid(row=7, column=0, columnspan=3, sticky="w", pady=(0, 6))
 
         # Row 8: Mod title and output directory
-        ttk.Label(parent, text="Optional Mod Package Title:").grid(row=8, column=0, sticky="w", pady=4)
-        ttk.Entry(parent, textvariable=self.ar_title_var).grid(row=8, column=1, sticky="ew", padx=6, pady=4)
+        ttk.Label(parent, text="Optional Mod Package Title:").grid(row=8, column=0, sticky="w", pady=6)
+        ttk.Entry(parent, textvariable=self.ar_title_var).grid(row=8, column=1, sticky="ew", padx=6, pady=6)
         self._file_row(parent, 9, "Working / Output Folder:", self.ar_out_var, self._browse_ar_out, "ar_out")
 
         # Row 10: Auto-detected Game Paths (Collapsible / Group Box)
@@ -1033,7 +1119,7 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
 
         # Row 11: Options
         opts_frame = ttk.Frame(parent)
-        opts_frame.grid(row=11, column=0, columnspan=3, sticky="w", pady=4)
+        opts_frame.grid(row=11, column=0, columnspan=3, sticky="w", pady=6)
 
         ttk.Checkbutton(
             opts_frame,
@@ -1086,28 +1172,28 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
             parent, 2, "Outfit input (.nif/.json/.7z):", self.raw_input_var, self._browse_raw_input, "raw_input"
         )
 
-        ttk.Label(parent, text="Body target preset:").grid(row=3, column=0, sticky="w", pady=4)
+        ttk.Label(parent, text="Body target preset:").grid(row=3, column=0, sticky="w", pady=6)
         self.raw_preset_combo = ttk.Combobox(
             parent,
             textvariable=self.raw_preset_var,
             values=preset_labels(),
             state="readonly",
         )
-        self.raw_preset_combo.grid(row=3, column=1, columnspan=2, sticky="ew", padx=(6, 0), pady=4)
+        self.raw_preset_combo.grid(row=3, column=1, columnspan=2, sticky="ew", padx=(6, 0), pady=6)
         self.raw_preset_combo.bind("<<ComboboxSelected>>", self._on_raw_preset_change)
         self._tip(self.raw_preset_combo, "raw_preset")
 
-        ttk.Label(parent, text="Custom body config:").grid(row=4, column=0, sticky="w", pady=4)
+        ttk.Label(parent, text="Custom body config:").grid(row=4, column=0, sticky="w", pady=6)
         self.raw_custom_entry = ttk.Entry(parent, textvariable=self.raw_custom_config_var, state="disabled")
-        self.raw_custom_entry.grid(row=4, column=1, sticky="ew", padx=6, pady=4)
+        self.raw_custom_entry.grid(row=4, column=1, sticky="ew", padx=6, pady=6)
         self.raw_custom_btn = ttk.Button(parent, text="Browse...", command=self._browse_raw_config, state="disabled")
-        self.raw_custom_btn.grid(row=4, column=2, sticky="w", pady=4)
+        self.raw_custom_btn.grid(row=4, column=2, sticky="w", pady=6)
         self._tip(self.raw_custom_entry, "raw_custom_config")
         self._tip(self.raw_custom_btn, "raw_custom_config")
 
         self._file_row(parent, 5, "Output folder:", self.raw_out_var, self._browse_raw_out, "raw_out")
 
-        ttk.Label(parent, text="Deformer:").grid(row=6, column=0, sticky="w", pady=4)
+        ttk.Label(parent, text="Deformer:").grid(row=6, column=0, sticky="w", pady=6)
         self.raw_deformer_box = ttk.Combobox(
             parent,
             textvariable=self.raw_deformer_var,
@@ -1115,7 +1201,7 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
             state="readonly",
             width=36,
         )
-        self.raw_deformer_box.grid(row=6, column=1, sticky="w", padx=6, pady=4)
+        self.raw_deformer_box.grid(row=6, column=1, sticky="w", padx=6, pady=6)
         self._tip(self.raw_deformer_box, "raw_deformer")
 
         raw_acts = ttk.Frame(parent)
@@ -1133,24 +1219,30 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
         # Donor merge section
         ttk.Separator(parent, orient="horizontal").grid(row=8, column=0, columnspan=3, sticky="ew", pady=(4, 8))
         ttk.Label(parent, text="Manual Donor Merge (Merge outfit .obj onto donor .obj)", style="Heading.TLabel").grid(
-            row=9, column=0, columnspan=3, sticky="w", pady=(0, 6)
+            row=9, column=0, columnspan=3, sticky="w", pady=(0, 2)
         )
-        self._file_row(parent, 10, "Donor item .obj:", self.merge_donor_var, self._browse_merge_donor)
-        self._file_row(parent, 11, "Outfit .obj:", self.merge_outfit_var, self._browse_merge_outfit)
-        self._file_row(parent, 12, "Merged output .obj:", self.merge_out_var, self._browse_merge_out)
+        ttk.Label(
+            parent,
+            text="For artists merging geometry by hand outside Blender. Not required for the Blender workflow above.",
+            style="Muted.TLabel",
+        ).grid(row=10, column=0, columnspan=3, sticky="w", pady=(0, 8))
+        self._file_row(parent, 11, "Donor item .obj:", self.merge_donor_var, self._browse_merge_donor, "merge_donor")
+        self._file_row(parent, 12, "Outfit .obj:", self.merge_outfit_var, self._browse_merge_outfit, "merge_outfit")
+        self._file_row(parent, 13, "Merged output .obj:", self.merge_out_var, self._browse_merge_out, "merge_out")
 
         merge_acts = ttk.Frame(parent)
-        merge_acts.grid(row=13, column=0, columnspan=3, sticky="w", pady=4)
+        merge_acts.grid(row=14, column=0, columnspan=3, sticky="w", pady=6)
         self.merge_btn = ttk.Button(merge_acts, text="Merge OBJ", command=self._start_merge)
         self.merge_btn.pack(side="left")
+        self._tip(self.merge_btn, "merge_btn")
 
     def _file_row(self, parent, row: int, label: str, var, command, tip_key: str | None = None) -> None:
         ttk = self._ttk
-        ttk.Label(parent, text=label).grid(row=row, column=0, sticky="w", pady=3)
+        ttk.Label(parent, text=label).grid(row=row, column=0, sticky="w", pady=5)
         entry = ttk.Entry(parent, textvariable=var)
-        entry.grid(row=row, column=1, sticky="ew", padx=6, pady=3)
+        entry.grid(row=row, column=1, sticky="ew", padx=6, pady=5)
         browse_btn = ttk.Button(parent, text="Browse...", command=command)
-        browse_btn.grid(row=row, column=2, sticky="w", pady=3)
+        browse_btn.grid(row=row, column=2, sticky="w", pady=5)
         if tip_key:
             self._tip(entry, tip_key)
             self._tip(browse_btn, tip_key)
