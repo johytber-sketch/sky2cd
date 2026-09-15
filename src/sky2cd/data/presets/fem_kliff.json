@@ -1,0 +1,15 @@
+{
+  "name": "Skyrim Female -> Fem Kliff",
+  "geometry_mode": "rigid_preview",
+  "reference_status": "Unvalidated 19-vertex proxy; not an authentic Fem Kliff body reference.",
+  "source_body": "skyrim_female_base.meshir.json",
+  "target_body": "fem_kliff_base.meshir.json",
+  "scale": 1.0,
+  "output_scale": 0.0142875,
+  "min_clearance": 0.001,
+  "skyrim_slots": [
+    "32",
+    "34",
+    "38"
+  ]
+}

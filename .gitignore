@@ -1,0 +1,28 @@
+.venv/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.vscode/
+
+# Local ad-hoc test/diagnostic runs against real game installs or real mods.
+# These can contain extracted/rebuilt Skyrim or Crimson Desert assets and must
+# never be committed or published.
+crimsonforge_test/
+diag_*/
+exe-smoke/
+geometry_diagnostic_*/
+out_auto_retest*/
+real_mod_test/
+_pynifly_probe/
+*_log.txt
+
+# Vendored PyNifly ships Bethesda-format reference skeletons, a Blender scene,
+# and a standalone .exe tool alongside its Python source. sky2cd's build and
+# release process intentionally excludes these (see THIRD_PARTY_NOTICES.md);
+# keep them out of version control for the same reason.
+src/sky2cd/vendor/io_scene_nifly/skeletons/
+src/sky2cd/vendor/io_scene_nifly/blender_assets/
+src/sky2cd/vendor/io_scene_nifly/hkxcmd.exe

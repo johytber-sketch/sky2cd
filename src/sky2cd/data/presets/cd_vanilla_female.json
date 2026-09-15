@@ -1,0 +1,15 @@
+{
+  "name": "Skyrim Female -> CD Vanilla Female",
+  "geometry_mode": "rigid_preview",
+  "reference_status": "Unvalidated proxy; not an authentic Crimson Desert body reference.",
+  "source_body": "skyrim_female_base.meshir.json",
+  "target_body": "cd_vanilla_female_base.meshir.json",
+  "scale": 1.0,
+  "output_scale": 0.0142875,
+  "min_clearance": 0.001,
+  "skyrim_slots": [
+    "32",
+    "34",
+    "38"
+  ]
+}

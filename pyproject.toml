@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sky2cd"
+version = "0.1.0"
+description = "Blender-first preparation tools for artist-assisted outfit workflows"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "sky2cd contributors" }]
+dependencies = [
+  "numpy>=1.23",
+  "scipy>=1.9",
+  "py7zr>=0.20",
+  "windnd>=1.0",
+  "fast-simplification>=0.1.4",
+  "pillow>=10.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+build = ["pyinstaller>=6.0"]
+nif = []
+# Needed only to use `sky2cd donors --verify` / `sky2cd auto-replace`, which load
+# a *separate*, already-installed CrimsonForge (https://github.com/hzeemr/crimsonforge,
+# MIT licensed) live off disk to read/rebuild real donor .pac files. These match
+# CrimsonForge's own real dependencies for its `core.vfs_manager`/`core.mesh_importer`
+# modules -- verified against its real requirements.txt.
+crimsonforge = ["lz4>=4.3", "cryptography>=42.0"]
+
+[project.scripts]
+sky2cd = "sky2cd.cli:main"
+
+[project.gui-scripts]
+sky2cd-gui = "sky2cd.gui:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+sky2cd = ["data/*.json", "data/presets/*.json", "data/presets/*.npz"]
+"sky2cd.vendor.io_scene_nifly" = ["LICENSE", "NiflyDLL.dll"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

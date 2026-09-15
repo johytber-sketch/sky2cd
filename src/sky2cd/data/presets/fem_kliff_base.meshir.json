@@ -1,0 +1,12 @@
+{
+  "schema": "sky2cd.meshir.v1",
+  "name": "fem_kliff_base",
+  "arrays": "fem_kliff_base.meshir.npz",
+  "bone_names": [
+    "NPC Root [Root]",
+    "NPC Pelvis [Pelv]",
+    "NPC Spine2 [Spn2]",
+    "NPC Neck [Neck]"
+  ],
+  "materials": []
+}
