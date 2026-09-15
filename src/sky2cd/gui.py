@@ -109,27 +109,41 @@ MERGE_SUBMESH_STRATEGIES = ["nearest", "append"]
 #: used elsewhere are intentionally left theme-neutral; they read fine on
 #: both backgrounds.
 THEME_LIGHT: dict[str, str] = {
-    "bg": "#f0f0f0",
+    "bg": "#f5f6f8",
     "fg": "#1a1a1a",
     "entry_bg": "#ffffff",
     "entry_fg": "#1a1a1a",
-    "button_bg": "#e1e1e1",
+    "button_bg": "#e4e6ea",
     "log_bg": "#ffffff",
     "log_fg": "#1a1a1a",
     "accent": "#3a7ca5",
+    "accent_fg": "#ffffff",
     "select_bg": "#cde4f3",
+    "card_bg": "#ffffff",
+    "border": "#d5d8dd",
+    "heading_fg": "#12314f",
+    "muted_fg": "#5b6472",
+    "tooltip_bg": "#2b2b2b",
+    "tooltip_fg": "#f2f2f2",
 }
 
 THEME_DARK: dict[str, str] = {
-    "bg": "#1e1e1e",
-    "fg": "#e0e0e0",
-    "entry_bg": "#2d2d30",
-    "entry_fg": "#e0e0e0",
-    "button_bg": "#3c3c3c",
-    "log_bg": "#252526",
-    "log_fg": "#d4d4d4",
-    "accent": "#0e639c",
-    "select_bg": "#264f78",
+    "bg": "#1b1c1e",
+    "fg": "#e6e6e6",
+    "entry_bg": "#2a2b2e",
+    "entry_fg": "#e6e6e6",
+    "button_bg": "#333437",
+    "log_bg": "#232427",
+    "log_fg": "#d9d9d9",
+    "accent": "#3d8bd4",
+    "accent_fg": "#ffffff",
+    "select_bg": "#2f5b82",
+    "card_bg": "#222325",
+    "border": "#3a3b3e",
+    "heading_fg": "#8fc4ff",
+    "muted_fg": "#a3a7ad",
+    "tooltip_bg": "#f2f2f2",
+    "tooltip_fg": "#1a1a1a",
 }
 
 
@@ -139,6 +153,107 @@ def theme_palette(dark: bool) -> dict[str, str]:
     Pure lookup, no tkinter import, so it can be unit tested headlessly.
     """
     return dict(THEME_DARK if dark else THEME_LIGHT)
+
+
+#: Concise hover-help text for the GUI's most confusing/high-value controls.
+#: Kept as a plain dict (no tkinter import) so its content is unit-testable
+#: on machines without a display. Keys are stable identifiers passed to
+#: ``_Sky2cdApp._tip`` when building widgets.
+TOOLTIPS: dict[str, str] = {
+    "raw_input": "Skyrim outfit to prepare: .nif, .meshir.json, .7z, or .zip. You can also drag a file onto the window.",
+    "raw_out": "Folder where preview files (source.obj, diagnostic PAC, report) are written. Created if missing.",
+    "raw_convert": "Creates Blender-preview geometry only. Not a fitted, rigged, or game-ready outfit.",
+    "raw_preset": "Target body used only for geometry/axis conversion during preview, not a validated fit.",
+    "raw_custom_config": "Optional custom body-config JSON, used instead of a built-in preset.",
+    "raw_deformer": "Geometry deformation method. Only 'idw' is implemented; the others are disabled stubs.",
+    "suggest_piece": "Outfit piece filename or path (e.g. Boots_1.nif) used to rank donor candidates.",
+    "suggest_donor": "Ranks donor candidates for this piece as a starting target. Does not guarantee fit, "
+    "rig, animation, or game-ready output.",
+    "suggestion_open_folder": "Open the folder containing the generated donor_suggestion.json.",
+    "dark_mode": "Toggle dark/light theme. Applies immediately and is remembered next time.",
+    "ar_input": "Skyrim outfit archive/mesh to package (.7z, .zip, .nif). Optional advanced/experimental path.",
+    "ar_preset": "Target body preset used for the optional DMM package geometry conversion.",
+    "ar_donor": "Donor item used as the optional DMM packaging starting target; pick via Suggest donor or manually.",
+    "ar_out": "Working/output folder for the optional DMM package build.",
+    "ar_packages_path": "Path to the real game's packages/ folder. Needed only for live donor verification, "
+    "in-game names, and DMM packaging; Blender preview works without it.",
+    "ar_crimsonforge_home": "Path to a CrimsonForge install. Needed only for live donor verification, in-game "
+    "names, and DMM packaging; Blender preview works without it.",
+    "dmm_generate": "Builds an experimental DMM package from an artist-rebuilt donor. Does not certify a "
+    "wearable or game-ready result on its own.",
+    "dmm_open_folder": "Open the folder containing the generated DMM package.",
+}
+
+
+class _Tooltip:  # pragma: no cover - requires a display to exercise
+    """A small delayed hover tooltip for a single ttk/tk widget.
+
+    Reads live colors from ``palette_getter`` at show time so it stays
+    correct across a dark/light toggle without needing to be rebuilt.
+    """
+
+    _DELAY_MS = 500
+
+    def __init__(self, widget, text: str, palette_getter) -> None:
+        self._widget = widget
+        self._text = text
+        self._palette_getter = palette_getter
+        self._after_id = None
+        self._popup = None
+        widget.bind("<Enter>", self._schedule, add="+")
+        widget.bind("<Leave>", self._hide, add="+")
+        widget.bind("<ButtonPress>", self._hide, add="+")
+
+    def _schedule(self, _event=None) -> None:
+        self._cancel()
+        self._after_id = self._widget.after(self._DELAY_MS, self._show)
+
+    def _cancel(self) -> None:
+        if self._after_id is not None:
+            try:
+                self._widget.after_cancel(self._after_id)
+            except Exception:
+                pass
+            self._after_id = None
+
+    def _show(self) -> None:
+        if self._popup is not None:
+            return
+        try:
+            import tkinter as tk
+
+            x = self._widget.winfo_rootx() + 12
+            y = self._widget.winfo_rooty() + self._widget.winfo_height() + 8
+            palette = self._palette_getter()
+            popup = tk.Toplevel(self._widget)
+            popup.wm_overrideredirect(True)
+            popup.wm_geometry(f"+{x}+{y}")
+            label = tk.Label(
+                popup,
+                text=self._text,
+                justify="left",
+                background=palette["tooltip_bg"],
+                foreground=palette["tooltip_fg"],
+                relief="solid",
+                borderwidth=1,
+                wraplength=320,
+                font=("Segoe UI", 8),
+                padx=6,
+                pady=3,
+            )
+            label.pack()
+            self._popup = popup
+        except Exception:
+            self._popup = None
+
+    def _hide(self, _event=None) -> None:
+        self._cancel()
+        if self._popup is not None:
+            try:
+                self._popup.destroy()
+            except Exception:
+                pass
+            self._popup = None
 
 
 def deformer_labels() -> list[str]:
@@ -567,6 +682,7 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
 
         self.status_var = tk.StringVar(value="Ready.")
         self.dark_mode_var = tk.BooleanVar(value=self.settings.dark_mode)
+        self._palette = theme_palette(self.settings.dark_mode)
 
         self._build_widgets()
         self._apply_theme(self.settings.dark_mode)
@@ -620,42 +736,61 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
 
     def _build_widgets(self) -> None:
         tk, ttk = self._tk, self._ttk
-        main_container = ttk.Frame(self.root, padding=10)
+        main_container = ttk.Frame(self.root, padding=12)
         main_container.pack(fill="both", expand=True)
+
+        header = ttk.Frame(main_container)
+        header.pack(fill="x", pady=(0, 8))
+        ttk.Label(header, text="Sky2CD", style="Heading.TLabel", font=("Segoe UI", 14, "bold")).pack(side="left")
+        ttk.Label(
+            header,
+            text="  Blender-first outfit prep, donor suggestions & optional DMM packaging",
+            style="Muted.TLabel",
+        ).pack(side="left")
 
         self.notebook = ttk.Notebook(main_container)
         self.notebook.pack(fill="both", expand=True)
 
         # TAB 1: Blender-preview preparation
-        self.tab_raw = ttk.Frame(self.notebook, padding=10)
+        self.tab_raw = ttk.Frame(self.notebook, padding=12)
         self.notebook.add(self.tab_raw, text="Blender Prep & Preview")
         self._build_raw_tab(self.tab_raw)
 
         # TAB 2: Optional experimental packaging
-        self.tab_dmm = ttk.Frame(self.notebook, padding=10)
+        self.tab_dmm = ttk.Frame(self.notebook, padding=12)
         self.notebook.add(self.tab_dmm, text="Advanced DMM Packaging (Experimental)")
         self._build_dmm_tab(self.tab_dmm)
 
         # Bottom Area: Progress, Status & Log (shared across tabs)
-        bottom_frame = ttk.Frame(main_container, padding=(0, 8, 0, 0))
+        bottom_frame = ttk.Frame(main_container, padding=(0, 10, 0, 0))
         bottom_frame.pack(fill="both", expand=True)
 
         self.progress = ttk.Progressbar(bottom_frame, mode="indeterminate")
-        self.progress.pack(fill="x", pady=(0, 4))
+        self.progress.pack(fill="x", pady=(0, 6))
 
         status_bar = ttk.Frame(bottom_frame)
-        status_bar.pack(fill="x", pady=(0, 4))
+        status_bar.pack(fill="x", pady=(0, 6))
         ttk.Label(status_bar, textvariable=self.status_var, font=("Segoe UI", 9, "bold")).pack(side="left")
-        ttk.Checkbutton(
+        self.dark_mode_check = ttk.Checkbutton(
             status_bar,
             text="Dark mode",
             variable=self.dark_mode_var,
             command=self._on_toggle_theme,
-        ).pack(side="right")
+        )
+        self.dark_mode_check.pack(side="right")
+        self._tip(self.dark_mode_check, "dark_mode")
 
         log_frame = ttk.Frame(bottom_frame)
         log_frame.pack(fill="both", expand=True)
-        self.log = tk.Text(log_frame, height=10, wrap="word", state="disabled", font=("Consolas", 9))
+        self.log = tk.Text(
+            log_frame,
+            height=10,
+            wrap="word",
+            state="disabled",
+            font=("Consolas", 9),
+            borderwidth=1,
+            relief="solid",
+        )
         self.log.pack(side="left", fill="both", expand=True)
         scroll = ttk.Scrollbar(log_frame, orient="vertical", command=self.log.yview)
         scroll.pack(side="right", fill="y")
@@ -727,6 +862,47 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
         )
         style.configure("Horizontal.TProgressbar", background=palette["accent"], troughcolor=palette["button_bg"])
         style.configure("TScrollbar", background=palette["button_bg"], troughcolor=palette["bg"])
+        style.configure("TSeparator", background=palette["border"])
+
+        # Modern-polish styles: section headings, grouped "card" frames, and
+        # a primary/accent button style for the main preview action.
+        style.configure(
+            "Heading.TLabel",
+            background=palette["bg"],
+            foreground=palette["heading_fg"],
+            font=("Segoe UI", 11, "bold"),
+        )
+        style.configure(
+            "Muted.TLabel",
+            background=palette["bg"],
+            foreground=palette["muted_fg"],
+            font=("Segoe UI", 8),
+        )
+        style.configure(
+            "Card.TLabelframe",
+            background=palette["card_bg"],
+            bordercolor=palette["border"],
+            relief="groove",
+        )
+        style.configure(
+            "Card.TLabelframe.Label",
+            background=palette["card_bg"],
+            foreground=palette["heading_fg"],
+            font=("Segoe UI", 9, "bold"),
+        )
+        style.configure(
+            "Accent.TButton",
+            background=palette["accent"],
+            foreground=palette["accent_fg"],
+            font=("Segoe UI", 9, "bold"),
+            padding=(10, 6),
+        )
+        style.map(
+            "Accent.TButton",
+            background=[("active", palette["accent"]), ("disabled", palette["button_bg"])],
+            foreground=[("disabled", palette["muted_fg"])],
+        )
+        style.configure("TButton", padding=(8, 4))
 
         # Combobox dropdown listboxes are plain Tk widgets and aren't styled by ttk.Style.
         self.root.option_add("*TCombobox*Listbox.background", palette["entry_bg"])
@@ -743,45 +919,67 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
                 selectbackground=palette["select_bg"],
             )
         self._dark_mode = dark
+        self._palette = palette
+
+    def _tip(self, widget, key: str) -> None:
+        """Attach a hover tooltip from :data:`TOOLTIPS` to ``widget``."""
+        text = TOOLTIPS.get(key)
+        if not text:
+            return
+        _Tooltip(widget, text, lambda: self._palette)
 
     def _build_dmm_tab(self, parent) -> None:
         ttk = self._ttk
         parent.columnconfigure(1, weight=1)
 
-        # Row 0: Outfit input
-        self._file_row(parent, 0, "Skyrim Outfit (.7z/.zip/.nif):", self.ar_input_var, self._browse_ar_input)
+        ttk.Label(
+            parent,
+            text="Advanced DMM Packaging — optional & experimental",
+            style="Heading.TLabel",
+        ).grid(row=0, column=0, columnspan=3, sticky="w", pady=(0, 2))
+        ttk.Label(
+            parent,
+            text="For artists who have already rebuilt and validated a donor-based .pac. "
+            "Does not certify a wearable or game-ready result.",
+            style="Muted.TLabel",
+        ).grid(row=1, column=0, columnspan=3, sticky="w", pady=(0, 8))
 
-        # Row 1: Target Body Preset
-        ttk.Label(parent, text="Body Target Preset:").grid(row=1, column=0, sticky="w", pady=4)
+        # Row 2: Outfit input
+        self._file_row(parent, 2, "Skyrim Outfit (.7z/.zip/.nif):", self.ar_input_var, self._browse_ar_input, "ar_input")
+
+        # Row 3: Target Body Preset
+        ttk.Label(parent, text="Body Target Preset:").grid(row=3, column=0, sticky="w", pady=4)
         self.ar_preset_combo = ttk.Combobox(
             parent,
             textvariable=self.ar_preset_var,
             values=preset_labels(),
             state="readonly",
         )
-        self.ar_preset_combo.grid(row=1, column=1, columnspan=2, sticky="ew", padx=(6, 0), pady=4)
+        self.ar_preset_combo.grid(row=3, column=1, columnspan=2, sticky="ew", padx=(6, 0), pady=4)
         self.ar_preset_combo.bind("<<ComboboxSelected>>", self._on_ar_preset_change)
+        self._tip(self.ar_preset_combo, "ar_preset")
 
-        # Row 2: Custom config (hidden/disabled unless chosen)
-        ttk.Label(parent, text="Custom Body Config:").grid(row=2, column=0, sticky="w", pady=4)
+        # Row 4: Custom config (hidden/disabled unless chosen)
+        ttk.Label(parent, text="Custom Body Config:").grid(row=4, column=0, sticky="w", pady=4)
         self.ar_custom_entry = ttk.Entry(parent, textvariable=self.ar_custom_config_var, state="disabled")
-        self.ar_custom_entry.grid(row=2, column=1, sticky="ew", padx=6, pady=4)
+        self.ar_custom_entry.grid(row=4, column=1, sticky="ew", padx=6, pady=4)
         self.ar_custom_btn = ttk.Button(parent, text="Browse...", command=self._browse_ar_config, state="disabled")
-        self.ar_custom_btn.grid(row=2, column=2, sticky="w", pady=4)
+        self.ar_custom_btn.grid(row=4, column=2, sticky="w", pady=4)
 
-        # Row 3: Donor suggestion input and action
-        ttk.Label(parent, text="Piece name/file for suggestion:").grid(row=3, column=0, sticky="w", pady=4)
-        ttk.Entry(parent, textvariable=self.ar_suggest_piece_var).grid(
-            row=3, column=1, sticky="ew", padx=6, pady=4
-        )
+        # Row 5: Donor suggestion input and action
+        ttk.Label(parent, text="Piece name/file for suggestion:").grid(row=5, column=0, sticky="w", pady=4)
+        suggest_entry = ttk.Entry(parent, textvariable=self.ar_suggest_piece_var)
+        suggest_entry.grid(row=5, column=1, sticky="ew", padx=6, pady=4)
+        self._tip(suggest_entry, "suggest_piece")
         suggest_actions = ttk.Frame(parent)
-        suggest_actions.grid(row=3, column=2, sticky="w", pady=4)
+        suggest_actions.grid(row=5, column=2, sticky="w", pady=4)
         self.suggest_donor_btn = ttk.Button(
             suggest_actions,
             text="Suggest donor",
             command=self._suggest_donor,
         )
         self.suggest_donor_btn.pack(side="left")
+        self._tip(self.suggest_donor_btn, "suggest_donor")
         self.suggestion_open_btn = ttk.Button(
             suggest_actions,
             text="Open JSON folder",
@@ -789,42 +987,53 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
             state="disabled",
         )
         self.suggestion_open_btn.pack(side="left", padx=(6, 0))
+        self._tip(self.suggestion_open_btn, "suggestion_open_folder")
 
-        # Row 4: Optional donor target selected by the recommendation or user
-        ttk.Label(parent, text="Optional donor starting target:").grid(row=4, column=0, sticky="w", pady=4)
+        # Row 6: Optional donor target selected by the recommendation or user
+        ttk.Label(parent, text="Optional donor starting target:").grid(row=6, column=0, sticky="w", pady=4)
         self.ar_donor_combo = ttk.Combobox(
             parent,
             textvariable=self.ar_donor_var,
             values=donor_labels(),
             state="readonly",
         )
-        self.ar_donor_combo.grid(row=4, column=1, columnspan=2, sticky="ew", padx=(6, 0), pady=4)
+        self.ar_donor_combo.grid(row=6, column=1, columnspan=2, sticky="ew", padx=(6, 0), pady=4)
+        self._tip(self.ar_donor_combo, "ar_donor")
 
         ttk.Label(
             parent,
             text="Starting target only. Artist validation required; DMM packaging is optional.",
             foreground="#9a6700",
-        ).grid(row=5, column=0, columnspan=3, sticky="w", pady=(0, 6))
+        ).grid(row=7, column=0, columnspan=3, sticky="w", pady=(0, 6))
 
-        # Row 6: Mod title and output directory
-        ttk.Label(parent, text="Optional Mod Package Title:").grid(row=6, column=0, sticky="w", pady=4)
-        ttk.Entry(parent, textvariable=self.ar_title_var).grid(row=6, column=1, sticky="ew", padx=6, pady=4)
-        self._file_row(parent, 7, "Working / Output Folder:", self.ar_out_var, self._browse_ar_out)
+        # Row 8: Mod title and output directory
+        ttk.Label(parent, text="Optional Mod Package Title:").grid(row=8, column=0, sticky="w", pady=4)
+        ttk.Entry(parent, textvariable=self.ar_title_var).grid(row=8, column=1, sticky="ew", padx=6, pady=4)
+        self._file_row(parent, 9, "Working / Output Folder:", self.ar_out_var, self._browse_ar_out, "ar_out")
 
-        # Row 6: Auto-detected Game Paths (Collapsible / Group Box)
-        paths_frame = ttk.LabelFrame(parent, text="⚙️ Game & Tool Paths (Auto-Detected)", padding=8)
-        paths_frame.grid(row=8, column=0, columnspan=3, sticky="ew", pady=(8, 4))
+        # Row 10: Auto-detected Game Paths (Collapsible / Group Box)
+        paths_frame = ttk.LabelFrame(parent, text="⚙️ Game & Tool Paths (Auto-Detected)", padding=8, style="Card.TLabelframe")
+        paths_frame.grid(row=10, column=0, columnspan=3, sticky="ew", pady=(8, 4))
         paths_frame.columnconfigure(1, weight=1)
 
-        self._file_row(paths_frame, 0, "Game 'packages/' folder:", self.ar_packages_var, self._browse_packages)
-        self._file_row(paths_frame, 1, "CrimsonForge folder:", self.ar_crimsonforge_var, self._browse_crimsonforge)
+        self._file_row(
+            paths_frame, 0, "Game 'packages/' folder:", self.ar_packages_var, self._browse_packages, "ar_packages_path"
+        )
+        self._file_row(
+            paths_frame,
+            1,
+            "CrimsonForge folder:",
+            self.ar_crimsonforge_var,
+            self._browse_crimsonforge,
+            "ar_crimsonforge_home",
+        )
 
-        self.detect_status_lbl = ttk.Label(paths_frame, text="Checking paths...", font=("Segoe UI", 8, "italic"))
+        self.detect_status_lbl = ttk.Label(paths_frame, text="Checking paths...", style="Muted.TLabel")
         self.detect_status_lbl.grid(row=2, column=0, columnspan=3, sticky="w", pady=(2, 0))
 
-        # Row 7: Options
+        # Row 11: Options
         opts_frame = ttk.Frame(parent)
-        opts_frame.grid(row=9, column=0, columnspan=3, sticky="w", pady=4)
+        opts_frame.grid(row=11, column=0, columnspan=3, sticky="w", pady=4)
 
         ttk.Checkbutton(
             opts_frame,
@@ -838,9 +1047,9 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
             variable=self.ar_parallel_var,
         ).pack(side="left")
 
-        # Row 8: Action Buttons
+        # Row 12: Action Buttons
         act_frame = ttk.Frame(parent)
-        act_frame.grid(row=10, column=0, columnspan=3, sticky="w", pady=(8, 4))
+        act_frame.grid(row=12, column=0, columnspan=3, sticky="w", pady=(8, 4))
 
         self.dmm_gen_btn = ttk.Button(
             act_frame,
@@ -848,6 +1057,7 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
             command=self._start_dmm_generate,
         )
         self.dmm_gen_btn.pack(side="left")
+        self._tip(self.dmm_gen_btn, "dmm_generate")
 
         self.dmm_open_btn = ttk.Button(
             act_frame,
@@ -856,36 +1066,48 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
             state="disabled",
         )
         self.dmm_open_btn.pack(side="left", padx=6)
+        self._tip(self.dmm_open_btn, "dmm_open_folder")
 
     def _build_raw_tab(self, parent) -> None:
         ttk = self._ttk
         parent.columnconfigure(1, weight=1)
 
         # Raw convert section
-        ttk.Label(parent, text="PREVIEW ONLY — Blender preparation; artist validation required", font=("Segoe UI", 9, "bold"), foreground="#9a6700").grid(
-            row=0, column=0, columnspan=3, sticky="w", pady=(0, 4)
+        ttk.Label(parent, text="Blender Prep & Preview", style="Heading.TLabel").grid(
+            row=0, column=0, columnspan=3, sticky="w", pady=(0, 2)
         )
-        self._file_row(parent, 1, "Outfit input (.nif/.json/.7z):", self.raw_input_var, self._browse_raw_input)
+        ttk.Label(
+            parent,
+            text="PREVIEW ONLY — Blender preparation; artist validation required",
+            font=("Segoe UI", 9, "bold"),
+            foreground="#9a6700",
+        ).grid(row=1, column=0, columnspan=3, sticky="w", pady=(0, 8))
+        self._file_row(
+            parent, 2, "Outfit input (.nif/.json/.7z):", self.raw_input_var, self._browse_raw_input, "raw_input"
+        )
 
-        ttk.Label(parent, text="Body target preset:").grid(row=2, column=0, sticky="w", pady=4)
+        ttk.Label(parent, text="Body target preset:").grid(row=3, column=0, sticky="w", pady=4)
         self.raw_preset_combo = ttk.Combobox(
             parent,
             textvariable=self.raw_preset_var,
             values=preset_labels(),
             state="readonly",
         )
-        self.raw_preset_combo.grid(row=2, column=1, columnspan=2, sticky="ew", padx=(6, 0), pady=4)
+        self.raw_preset_combo.grid(row=3, column=1, columnspan=2, sticky="ew", padx=(6, 0), pady=4)
         self.raw_preset_combo.bind("<<ComboboxSelected>>", self._on_raw_preset_change)
+        self._tip(self.raw_preset_combo, "raw_preset")
 
-        ttk.Label(parent, text="Custom body config:").grid(row=3, column=0, sticky="w", pady=4)
+        ttk.Label(parent, text="Custom body config:").grid(row=4, column=0, sticky="w", pady=4)
         self.raw_custom_entry = ttk.Entry(parent, textvariable=self.raw_custom_config_var, state="disabled")
-        self.raw_custom_entry.grid(row=3, column=1, sticky="ew", padx=6, pady=4)
+        self.raw_custom_entry.grid(row=4, column=1, sticky="ew", padx=6, pady=4)
         self.raw_custom_btn = ttk.Button(parent, text="Browse...", command=self._browse_raw_config, state="disabled")
-        self.raw_custom_btn.grid(row=3, column=2, sticky="w", pady=4)
+        self.raw_custom_btn.grid(row=4, column=2, sticky="w", pady=4)
+        self._tip(self.raw_custom_entry, "raw_custom_config")
+        self._tip(self.raw_custom_btn, "raw_custom_config")
 
-        self._file_row(parent, 4, "Output folder:", self.raw_out_var, self._browse_raw_out)
+        self._file_row(parent, 5, "Output folder:", self.raw_out_var, self._browse_raw_out, "raw_out")
 
-        ttk.Label(parent, text="Deformer:").grid(row=5, column=0, sticky="w", pady=4)
+        ttk.Label(parent, text="Deformer:").grid(row=6, column=0, sticky="w", pady=4)
         self.raw_deformer_box = ttk.Combobox(
             parent,
             textvariable=self.raw_deformer_var,
@@ -893,36 +1115,45 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
             state="readonly",
             width=36,
         )
-        self.raw_deformer_box.grid(row=5, column=1, sticky="w", padx=6, pady=4)
+        self.raw_deformer_box.grid(row=6, column=1, sticky="w", padx=6, pady=4)
+        self._tip(self.raw_deformer_box, "raw_deformer")
 
         raw_acts = ttk.Frame(parent)
-        raw_acts.grid(row=6, column=0, columnspan=3, sticky="w", pady=(4, 8))
-        self.raw_convert_btn = ttk.Button(raw_acts, text="Create Preview Files", command=self._start_raw_convert)
+        raw_acts.grid(row=7, column=0, columnspan=3, sticky="w", pady=(6, 10))
+        self.raw_convert_btn = ttk.Button(
+            raw_acts, text="Create Preview Files", command=self._start_raw_convert, style="Accent.TButton"
+        )
         self.raw_convert_btn.pack(side="left")
+        self._tip(self.raw_convert_btn, "raw_convert")
         self.raw_report_btn = ttk.Button(raw_acts, text="Show Report", command=self._show_report, state="disabled")
         self.raw_report_btn.pack(side="left", padx=6)
         self.raw_folder_btn = ttk.Button(raw_acts, text="Open Output", command=self._open_output, state="disabled")
         self.raw_folder_btn.pack(side="left")
 
         # Donor merge section
-        ttk.Separator(parent, orient="horizontal").grid(row=7, column=0, columnspan=3, sticky="ew", pady=(8, 4))
-        ttk.Label(parent, text="Manual Donor Merge (Merge outfit .obj onto donor .obj):", font=("Segoe UI", 9, "bold")).grid(
-            row=8, column=0, columnspan=3, sticky="w", pady=(0, 4)
+        ttk.Separator(parent, orient="horizontal").grid(row=8, column=0, columnspan=3, sticky="ew", pady=(4, 8))
+        ttk.Label(parent, text="Manual Donor Merge (Merge outfit .obj onto donor .obj)", style="Heading.TLabel").grid(
+            row=9, column=0, columnspan=3, sticky="w", pady=(0, 6)
         )
-        self._file_row(parent, 9, "Donor item .obj:", self.merge_donor_var, self._browse_merge_donor)
-        self._file_row(parent, 10, "Outfit .obj:", self.merge_outfit_var, self._browse_merge_outfit)
-        self._file_row(parent, 11, "Merged output .obj:", self.merge_out_var, self._browse_merge_out)
+        self._file_row(parent, 10, "Donor item .obj:", self.merge_donor_var, self._browse_merge_donor)
+        self._file_row(parent, 11, "Outfit .obj:", self.merge_outfit_var, self._browse_merge_outfit)
+        self._file_row(parent, 12, "Merged output .obj:", self.merge_out_var, self._browse_merge_out)
 
         merge_acts = ttk.Frame(parent)
-        merge_acts.grid(row=12, column=0, columnspan=3, sticky="w", pady=4)
+        merge_acts.grid(row=13, column=0, columnspan=3, sticky="w", pady=4)
         self.merge_btn = ttk.Button(merge_acts, text="Merge OBJ", command=self._start_merge)
         self.merge_btn.pack(side="left")
 
-    def _file_row(self, parent, row: int, label: str, var, command) -> None:
+    def _file_row(self, parent, row: int, label: str, var, command, tip_key: str | None = None) -> None:
         ttk = self._ttk
         ttk.Label(parent, text=label).grid(row=row, column=0, sticky="w", pady=3)
-        ttk.Entry(parent, textvariable=var).grid(row=row, column=1, sticky="ew", padx=6, pady=3)
-        ttk.Button(parent, text="Browse...", command=command).grid(row=row, column=2, sticky="w", pady=3)
+        entry = ttk.Entry(parent, textvariable=var)
+        entry.grid(row=row, column=1, sticky="ew", padx=6, pady=3)
+        browse_btn = ttk.Button(parent, text="Browse...", command=command)
+        browse_btn.grid(row=row, column=2, sticky="w", pady=3)
+        if tip_key:
+            self._tip(entry, tip_key)
+            self._tip(browse_btn, tip_key)
 
     def _update_auto_detection_status(self) -> None:
         text, foreground = game_tool_path_status(

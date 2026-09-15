@@ -311,6 +311,88 @@ def test_theme_palette_returns_independent_copies():
     assert second["bg"] != "#000000"
 
 
+def test_theme_palette_includes_polish_and_tooltip_keys():
+    """Modernization-pass keys (headings, cards, tooltip colors) must exist in both themes."""
+    polish_keys = {
+        "card_bg",
+        "border",
+        "heading_fg",
+        "muted_fg",
+        "accent_fg",
+        "tooltip_bg",
+        "tooltip_fg",
+    }
+    dark = gui.theme_palette(True)
+    light = gui.theme_palette(False)
+    assert polish_keys <= dark.keys()
+    assert polish_keys <= light.keys()
+
+
+def test_tooltips_registry_covers_key_controls():
+    """Every high-value control called out by the tooltip request must have hover text."""
+    expected_keys = {
+        "raw_input",
+        "raw_out",
+        "raw_convert",
+        "suggest_piece",
+        "suggest_donor",
+        "suggestion_open_folder",
+        "dark_mode",
+        "raw_preset",
+        "ar_packages_path",
+        "ar_crimsonforge_home",
+        "dmm_generate",
+    }
+    assert expected_keys <= gui.TOOLTIPS.keys()
+    for key, text in gui.TOOLTIPS.items():
+        assert isinstance(text, str) and text.strip(), key
+        assert len(text) < 220, f"tooltip {key!r} is too long to read at a glance"
+
+
+def test_tooltip_text_never_claims_guaranteed_fit_or_game_ready_output():
+    """Donor-suggestion tooltips must keep the honest starting-point boundary."""
+    suggest_text = gui.TOOLTIPS["suggest_donor"].lower()
+    assert "does not guarantee" in suggest_text
+    assert "game-ready" in suggest_text
+    assert "guaranteed" not in suggest_text
+    assert "certifies" not in suggest_text
+
+
+def test_tooltip_helper_schedules_and_cancels_without_a_display():
+    """_Tooltip only needs objects that look like widgets; verify the show/hide contract."""
+
+    class _FakeWidget:
+        def __init__(self):
+            self.bound: dict[str, list] = {}
+            self.after_calls: list[tuple[int, object]] = []
+            self.cancelled: list[object] = []
+
+        def bind(self, sequence, func, add=None):
+            self.bound.setdefault(sequence, []).append(func)
+
+        def after(self, delay_ms, callback):
+            token = object()
+            self.after_calls.append((delay_ms, callback))
+            return token
+
+        def after_cancel(self, token):
+            self.cancelled.append(token)
+
+    widget = _FakeWidget()
+    tip = gui._Tooltip(widget, "hello", lambda: gui.theme_palette(True))
+
+    assert "<Enter>" in widget.bound
+    assert "<Leave>" in widget.bound
+    assert "<ButtonPress>" in widget.bound
+
+    # Simulate hovering: schedule then immediately leaving before the delay fires.
+    widget.bound["<Enter>"][0]()
+    assert widget.after_calls
+    widget.bound["<Leave>"][0]()
+    assert widget.cancelled
+    assert tip._popup is None
+
+
 def test_user_settings_defaults_to_dark_mode():
     from sky2cd.settings import UserSettings
 
