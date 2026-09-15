@@ -18,7 +18,7 @@ def test_cli_messaging_centers_blender_preview_and_marks_advanced_utilities_opti
     parser = build_parser()
     help_text = parser.format_help()
 
-    assert "Blender-first" in WELCOME
+    assert "Blender workflow" in WELCOME
     assert "preview/mockup" in WELCOME
     assert "not a fitted, rigged, tested, or game-ready outfit" in WELCOME
     assert "optional advanced utilities" in WELCOME

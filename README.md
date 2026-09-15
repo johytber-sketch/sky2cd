@@ -1,6 +1,6 @@
 # sky2cd
 
-`sky2cd` is a Blender-first preparation toolkit for artist-assisted Skyrim outfit work. It uses a game-agnostic `MeshIR` intermediate representation to make input inspection, safe geometry/axis conversion, and Blender handoff repeatable without claiming that an outfit is converted into a wearable game asset.
+`sky2cd` is a Blender preparation toolkit for artist-assisted Skyrim outfit work. It uses a game-agnostic `MeshIR` intermediate representation to make input inspection, safe geometry/axis conversion, and Blender handoff repeatable without claiming that an outfit is converted into a wearable game asset.
 
 For a placeholder-only first run, see
 [`docs/EXAMPLE_WORKFLOW.md`](docs/EXAMPLE_WORKFLOW.md). For a full practical
@@ -16,7 +16,7 @@ The recommended workflow ends with a Blender preview/mockup that an artist evalu
 and develops manually. It does **not** produce a fitted, rigged, tested, or game-ready
 outfit.
 
-**What the Blender-first workflow provides:**
+**What the Blender workflow provides:**
 - NIF/archive intake plus safe geometry and axis conversion.
 - A self-contained Blender handoff bundle: source preview OBJ(s), metadata, and an
   import script that labels assets for visual review.
@@ -520,7 +520,7 @@ first place.
 ## Historical research: external tooling and optional packaging
 
 This section records research into external tooling and advanced packaging paths. It
-does not change `sky2cd`'s Blender-first scope: neither donor selection, automated
+does not change `sky2cd`'s Blender-focused scope: neither donor selection, automated
 steps, nor a packaged file establishes a fitted, rigged, wearable, or game-ready
 result. Treat these paths as optional support for an artist's independently validated
 work, not the primary workflow.
@@ -741,7 +741,7 @@ recommended default.)
 ## Optional donor catalog and experimental automation (`sky2cd donors` / `sky2cd auto-replace`)
 
 These optional advanced utilities can assist an artist who has already established and
-validated a custom body-fit workflow. They are not the recommended Blender-first path
+validated a custom body-fit workflow. They are not the recommended Blender workflow
 and do not automatically convert a Skyrim outfit into a wearable or game-ready asset.
 
 **1. Donor Catalog (`sky2cd.donor_catalog`)** — a small, *metadata-only* list of known

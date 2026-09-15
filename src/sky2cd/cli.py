@@ -9,7 +9,7 @@ from sky2cd.pipeline import convert, pretty_report
 from sky2cd.presets import build_custom_preset, list_presets
 
 WELCOME = """\
-sky2cd - Blender-first preparation tools for artist-assisted outfit work
+sky2cd - Blender preparation tools for artist-assisted outfit work
 
 sky2cd prepares Skyrim outfit geometry for inspection and manual work in Blender. Its
 primary output is a preview/mockup, not a fitted, rigged, tested, or game-ready outfit.
@@ -19,7 +19,7 @@ rebuild/export, and in-game/animation testing.
 Donor lookup/export and DMM packaging are optional advanced utilities for work the
 artist has already rebuilt and validated; they do not certify a usable in-game result.
 
-No command was given. Start with the Blender-first workflow:
+No command was given. Start with the Blender workflow:
 
   sky2cd blender-handoff --input <outfit.zip> --out <dir>
       # writes source preview OBJ(s), metadata, and an import_script.py for Blender.
@@ -82,7 +82,7 @@ def _load_body_mesh(path: Path):
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="sky2cd",
-        description="Blender-first preparation tools for artist-assisted outfit work (preview/mockup output, not game-ready conversion)",
+        description="Blender preparation tools for artist-assisted outfit work (preview/mockup output, not game-ready conversion)",
     )
     subcommands = parser.add_subparsers(dest="command", required=True)
 

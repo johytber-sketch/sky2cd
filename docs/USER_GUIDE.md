@@ -7,7 +7,7 @@ For licensing details and the current release blocker, see
 
 ## What sky2cd is
 
-A Blender-first preparation toolkit for artist-assisted Skyrim-to-Crimson-Desert
+A Blender preparation toolkit for artist-assisted Skyrim-to-Crimson-Desert
 outfit work. It converts an outfit's source geometry into a preview/mockup you
 inspect and develop manually in Blender, and it can rank donor candidates so
 you don't have to guess cryptic catalog IDs by hand.
@@ -123,7 +123,7 @@ Each piece folder under `handoff_out\handoff\` contains:
 
 Instead of manually decoding cryptic donor catalog IDs, ask for a ranked
 recommendation. This is entirely optional and never required for the
-Blender-first workflow above.
+Blender workflow above.
 
 **Terminal, quick read:**
 

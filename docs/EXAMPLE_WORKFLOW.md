@@ -1,4 +1,4 @@
-# Placeholder-only Blender-first walkthrough
+# Placeholder-only Blender walkthrough
 
 This walkthrough names **no bundled game or mod assets**. Replace every
 `<PLACEHOLDER>` with a path to a file you are permitted to use.

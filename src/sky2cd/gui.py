@@ -604,7 +604,7 @@ def _write_crash_log(context: str, detail: str) -> None:
 
 
 def _legacy_run() -> int:
-    """Retained legacy launcher; the Blender-first ``run`` above is active."""
+    """Retained legacy launcher; the Blender-focused ``run`` above is active."""
     try:
         import tkinter  # noqa: F401
     except ImportError as exc:
@@ -775,7 +775,7 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
         )
         ttk.Label(
             header,
-            text="   Blender-first outfit prep · donor suggestions · optional DMM packaging",
+            text="   Blender outfit prep · donor suggestions · optional DMM packaging",
             style="Muted.TLabel",
         ).pack(side="left")
 
