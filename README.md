@@ -1134,6 +1134,10 @@ come from (a donor export/Blender scene and the `source.obj` from Create Preview
 Files, respectively). The window uses a larger, modern flat layout: pill-style tabs,
 a bigger default size, section headings, borderless "card" panels (e.g. Game & Tool
 Paths), and an accent-colored primary action button, in both light and dark themes.
+The tabs area and the status/log panel below are separated by a **draggable
+divider** (a thin horizontal bar just above the progress bar) — click and drag it
+up or down to give the log more or less room, the same way a resizable panel works
+in most modern editors.
 
 ```powershell
 pip install -e .[dev]

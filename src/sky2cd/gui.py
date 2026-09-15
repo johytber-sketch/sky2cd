@@ -779,7 +779,26 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
             style="Muted.TLabel",
         ).pack(side="left")
 
-        self.notebook = ttk.Notebook(main_container)
+        # A vertical paned window lets the user drag the divider between the
+        # tabs above and the status/log area below, resizing either one -
+        # the log panel is no longer a fixed height. A plain tk.PanedWindow
+        # (not ttk) is used here because it exposes a thicker, easier-to-grab
+        # sash than ttk's hairline-thin Panedwindow sash.
+        self.main_paned = tk.PanedWindow(
+            main_container,
+            orient="vertical",
+            sashwidth=6,
+            sashrelief="flat",
+            sashpad=0,
+            borderwidth=0,
+            opaqueresize=True,
+        )
+        self.main_paned.pack(fill="both", expand=True)
+
+        top_pane = ttk.Frame(self.main_paned)
+        self.main_paned.add(top_pane, stretch="always", minsize=240, height=520)
+
+        self.notebook = ttk.Notebook(top_pane)
         self.notebook.pack(fill="both", expand=True)
 
         # TAB 1: Blender-preview preparation
@@ -793,8 +812,8 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
         self._build_dmm_tab(self.tab_dmm)
 
         # Bottom Area: Progress, Status & Log (shared across tabs)
-        bottom_frame = ttk.Frame(main_container, padding=(0, 14, 0, 0))
-        bottom_frame.pack(fill="both", expand=True)
+        bottom_frame = ttk.Frame(self.main_paned, padding=(0, 14, 0, 0))
+        self.main_paned.add(bottom_frame, stretch="always", minsize=90, height=190)
 
         self.progress = ttk.Progressbar(bottom_frame, mode="indeterminate")
         self.progress.pack(fill="x", pady=(0, 8))
@@ -994,6 +1013,11 @@ class _Sky2cdApp:  # pragma: no cover - requires a display to exercise
         self.root.option_add("*TCombobox*Listbox.selectForeground", palette["entry_fg"])
 
         self.root.configure(background=palette["bg"])
+        if hasattr(self, "main_paned"):
+            self.main_paned.configure(
+                background=palette["border"],
+                sashcursor="sb_v_double_arrow",
+            )
         if hasattr(self, "log"):
             self.log.configure(
                 background=palette["log_bg"],
