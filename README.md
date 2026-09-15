@@ -3,8 +3,10 @@
 `sky2cd` is a Blender-first preparation toolkit for artist-assisted Skyrim outfit work. It uses a game-agnostic `MeshIR` intermediate representation to make input inspection, safe geometry/axis conversion, and Blender handoff repeatable without claiming that an outfit is converted into a wearable game asset.
 
 For a placeholder-only first run, see
-[`docs/EXAMPLE_WORKFLOW.md`](docs/EXAMPLE_WORKFLOW.md). Third-party licensing
-and the current public-binary release blocker are recorded in
+[`docs/EXAMPLE_WORKFLOW.md`](docs/EXAMPLE_WORKFLOW.md). For a full practical
+user guide covering install, first launch, the GUI, donor suggestions, and
+troubleshooting, see [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md). Third-party
+licensing and the current public-binary release blocker are recorded in
 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
 
 ## Supported workflow (read this first)

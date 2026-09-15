@@ -43,3 +43,28 @@ def test_example_workflow_is_placeholder_only_and_preserves_boundary():
         for path in (ROOT / "docs").rglob("*")
         if path.is_file()
     )
+
+
+def test_user_guide_documents_key_workflows_and_boundary():
+    guide = (ROOT / "docs" / "USER_GUIDE.md").read_text(encoding="utf-8")
+
+    # Install/no-Python-required messaging.
+    assert "do not need to install Python separately" in guide
+    assert "sky2cd-gui.exe" in guide and "sky2cd.exe" in guide
+
+    # Core workflows covered.
+    assert "Dark mode" in guide
+    assert "blender-handoff" in guide
+    assert "--suggest-out" in guide
+    assert "package-dmm" in guide
+
+    # Troubleshooting coverage.
+    assert "SmartScreen" in guide
+    assert "Fully close every open Sky2CD window" in guide
+    assert "CrimsonForge" in guide
+
+    # Honest boundary language, not marketing claims.
+    assert "does not guarantee fit" in guide or "No automatic body fitting" in guide
+    assert "game-ready" in guide
+    assert "THIRD_PARTY_NOTICES.md" in guide
+
